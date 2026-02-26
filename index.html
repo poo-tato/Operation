@@ -2,12 +2,19 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>iArch Studio Console</title>
+    <title>iArch Studio Cloud</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
         body { background-color: #f8fafc; color: #334155; font-family: 'Pretendard', sans-serif; margin: 0; padding: 60px 20px; display: flex; justify-content: center; }
-        .main-wrapper { width: 100%; max-width: 850px; }
+        .main-wrapper { width: 100%; max-width: 850px; display: none; } /* 로그인 전 숨김 */
+
+        /* 로그인 섹션 */
+        #auth-section { text-align: center; margin-top: 15vh; }
+        .login-btn { background: #0f172a; color: white; border: none; padding: 16px 32px; border-radius: 14px; font-weight: 700; cursor: pointer; font-size: 16px; }
 
         .header { margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; }
         .header h1 { font-size: 36px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -1px; }
@@ -17,21 +24,13 @@
         .summary-item b { color: #6366f1; font-size: 24px; font-weight: 800; }
         .summary-item span { font-size: 14px; color: #64748b; margin-left: 8px; font-weight: 600; }
 
-        /* 검색창 스타일 */
         .search-box { margin-bottom: 20px; position: relative; }
-        .search-box input { 
-            width: 100%; box-sizing: border-box; border: 2px solid #e2e8f0; background: #fff; 
-            padding: 12px 18px 12px 45px; border-radius: 14px; font-size: 14px; outline: none; transition: 0.2s;
-        }
-        .search-box input:focus { border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .search-box input { width: 100%; box-sizing: border-box; border: 2px solid #e2e8f0; background: #fff; padding: 12px 18px 12px 45px; border-radius: 14px; font-size: 14px; outline: none; }
         .search-box::before { content: "🔍"; position: absolute; left: 18px; top: 12px; font-size: 16px; opacity: 0.5; }
 
         .input-card { background: white; padding: 25px; border-radius: 24px; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.04); display: flex; gap: 12px; margin-bottom: 30px; border: 1px solid #f1f5f9; }
-        .input-card input { flex: 1; border: 1px solid #e2e8f0; background: #fff; padding: 14px 18px; border-radius: 14px; font-size: 14px; outline: none; transition: 0.2s; }
-        .input-card input:focus { border-color: #6366f1; background: #fdfeff; }
-        
-        .add-btn { background: #0f172a; color: white; border: none; padding: 0 30px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; }
-        .add-btn:hover { background: #1e293b; transform: translateY(-2px); }
+        .input-card input { flex: 1; border: 1px solid #e2e8f0; background: #fff; padding: 14px 18px; border-radius: 14px; font-size: 14px; outline: none; }
+        .add-btn { background: #0f172a; color: white; border: none; padding: 0 30px; border-radius: 14px; font-weight: 700; cursor: pointer; }
 
         .item { background: white; margin-bottom: 14px; padding: 22px; border-radius: 20px; display: flex; align-items: center; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02); border: 1px solid #f1f5f9; }
         .info { flex: 1; }
@@ -39,23 +38,24 @@
         .info .client { font-size: 13px; color: #94a3b8; margin-top: 4px; display: flex; gap: 10px; }
 
         .price { font-weight: 800; margin-right: 25px; color: #334155; font-size: 16px; }
-
-        select { border: 1px solid #e2e8f0; background: #f8fafc; padding: 8px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; outline: none; }
-        .st-w { color: #94a3b8; } 
-        .st-i { color: #6366f1; border-color: #c7d2fe; background: #eef2ff; } 
-        .st-d { color: #10b981; border-color: #a7f3d0; background: #ecfdf5; } 
-
+        select { border: 1px solid #e2e8f0; background: #f8fafc; padding: 8px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; outline: none; }
+        .st-w { color: #94a3b8; } .st-i { color: #6366f1; border-color: #c7d2fe; background: #eef2ff; } .st-d { color: #10b981; border-color: #a7f3d0; background: #ecfdf5; } 
         .btn-del { margin-left: 20px; background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 13px; }
-        .btn-del:hover { color: #f43f5e; }
     </style>
 </head>
 <body>
 
-<div class="main-wrapper">
+<div id="auth-section">
+    <h1>iArch Console</h1>
+    <p style="color:#94a3b8; margin-bottom:30px;">Cloud Production Mode</p>
+    <button class="login-btn" onclick="login()">Google Login</button>
+</div>
+
+<div class="main-wrapper" id="main-wrapper">
     <div class="header">
         <div>
-            <h1>돈 많이 벌자 💸</h1>
-            <p>iArch Studio Operation Ledger</p>
+            <h1 onclick="logout()" style="cursor:pointer">돈 많이 벌자 💸</h1>
+            <p>iArch Studio Operation Ledger (Cloud)</p>
         </div>
         <div id="clock" style="font-size: 13px; color: #cbd5e1; font-family: monospace;"></div>
     </div>
@@ -66,7 +66,7 @@
     </div>
 
     <div class="search-box">
-        <input type="text" id="searchInput" onkeyup="render()" placeholder="프로젝트명 또는 고객 닉네임으로 검색...">
+        <input type="text" id="searchInput" onkeyup="renderList()" placeholder="프로젝트명 또는 고객 닉네임 검색...">
     </div>
 
     <div class="input-card">
@@ -80,43 +80,71 @@
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('iarch_vFinal')) || [];
+    // ⚠️ 파이어베이스 콘솔에서 복사한 설정을 여기에 넣으세요
+        const firebaseConfig = {
+        apiKey: "AIzaSyAP1bV3mqVQBPZn1CV_YQ0BlboJiIDkATs",
+        authDomain: "operation-502d9.firebaseapp.com",
+        projectId: "operation-502d9",
+        storageBucket: "operation-502d9.firebasestorage.app",
+        messagingSenderId: "1087720589398",
+        appId: "1:1087720589398:web:85cebf4484eae1755d53f7",
+        measurementId: "G-50G9TKQ9CH"
+        };
 
-    function render() {
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    let projects = [];
+
+    // 로그인 핸들러
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            // 본인 이메일만 허용하고 싶다면 아래 주석 해제
+            // if(user.email !== "your-email@gmail.com") { alert("Access Denied"); logout(); return; }
+            document.getElementById('auth-section').style.display = 'none';
+            document.getElementById('main-wrapper').style.display = 'block';
+            syncData();
+        } else {
+            document.getElementById('auth-section').style.display = 'block';
+            document.getElementById('main-wrapper').style.display = 'none';
+        }
+    });
+
+    function login() { auth.signInWithPopup(provider); }
+    function logout() { auth.signOut(); }
+
+    // 데이터 실시간 동기화
+    function syncData() {
+        db.collection("iarch_ledger").orderBy("fullDate", "desc").onSnapshot(snapshot => {
+            projects = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderList();
+        });
+    }
+
+    function renderList() {
         const list = document.getElementById('list');
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         list.innerHTML = '';
         
-        // 검색 필터링 적용
-        const filteredDb = db.filter(item => 
-            item.p.toLowerCase().includes(searchTerm) || 
-            item.c.toLowerCase().includes(searchTerm)
-        );
+        const filtered = projects.filter(o => o.p.toLowerCase().includes(searchTerm) || o.c.toLowerCase().includes(searchTerm));
 
-        // 최신순 정렬
-        filteredDb.sort((a, b) => new Date(b.fullDate) - new Date(a.fullDate));
-
-        filteredDb.forEach((o, i) => {
-            // 원본 배열에서의 실제 인덱스를 찾아야 함 (삭제/상태변경용)
-            const originalIndex = db.findIndex(item => item === o);
-
+        filtered.forEach(o => {
             const div = document.createElement('div');
             div.className = 'item';
             div.innerHTML = `
                 <div class="info">
                     <span class="title">${o.p}</span>
-                    <span class="client">
-                        <span>👤 ${o.c}</span>
-                        <span>📅 ${o.date || '-'}</span>
-                    </span>
+                    <span class="client"><span>👤 ${o.c}</span><span>📅 ${o.date}</span></span>
                 </div>
                 <div class="price">₩${Number(o.v).toLocaleString()}</div>
-                <select onchange="st(${originalIndex}, this.value)" class="st-${o.s}">
-                    <option value="w" ${o.s==='w'?'selected':''}>대기</option>
-                    <option value="i" ${o.s==='i'?'selected':''}>진행</option>
-                    <option value="d" ${o.s==='d'?'selected':''}>완료</option>
+                <select onchange="updateStatus('${o.id}', this.value)" class="st-${o.s}">
+                    <option value="w" ${o.s==='w'?'selected':''}>Pending</option>
+                    <option value="i" ${o.s==='i'?'selected':''}>Running</option>
+                    <option value="d" ${o.s==='d'?'selected':''}>Success</option>
                 </select>
-                <button class="btn-del" onclick="rm(${originalIndex})">삭제</button>
+                <button class="btn-del" onclick="remove('${o.id}')">삭제</button>
             `;
             list.appendChild(div);
         });
@@ -124,8 +152,8 @@
     }
 
     function updateStats() {
-        const active = db.filter(o => o.s !== 'd').length;
-        const rev = db.filter(o => o.s === 'd').reduce((a, b) => a + Number(b.v), 0);
+        const active = projects.filter(o => o.s !== 'd').length;
+        const rev = projects.filter(o => o.s === 'd').reduce((a, b) => a + Number(b.v), 0);
         document.getElementById('count-active').innerText = active;
         document.getElementById('sum-revenue').innerText = rev.toLocaleString() + '원';
     }
@@ -133,32 +161,19 @@
     function add() {
         const p=document.getElementById('p'), c=document.getElementById('c'), v=document.getElementById('v');
         if(!p.value || !c.value || !v.value) return;
-        
         const now = new Date();
-        const dateStr = `${now.getMonth()+1}/${now.getDate()}`;
-
-        db.push({
-            p: p.value, 
-            c: c.value, 
-            v: v.value, 
-            s: 'w',
-            date: dateStr,
-            fullDate: now.toISOString() // 정렬용 전체 날짜
+        db.collection("iarch_ledger").add({
+            p: p.value, c: c.value, v: v.value, s: 'w',
+            date: `${now.getMonth()+1}/${now.getDate()}`,
+            fullDate: now.toISOString()
         });
-        save(); p.value=''; c.value=''; v.value='';
-        document.getElementById('searchInput').value = ''; // 추가 후 검색 초기화
+        p.value=''; c.value=''; v.value='';
     }
 
-    function st(i,v){ db[i].s=v; save(); }
-    function rm(i){ if(confirm('프로젝트 기록을 삭제할까요?')){ db.splice(i,1); save(); } }
-    function save(){ localStorage.setItem('iarch_vFinal', JSON.stringify(db)); render(); }
+    function updateStatus(id, val) { db.collection("iarch_ledger").doc(id).update({ s: val }); }
+    function remove(id) { if(confirm('Drop this project?')) db.collection("iarch_ledger").doc(id).delete(); }
 
-    setInterval(() => {
-        const n = new Date();
-        document.getElementById('clock').innerText = n.toLocaleTimeString();
-    }, 1000);
-
-    render();
+    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
 </script>
 
 </body>
