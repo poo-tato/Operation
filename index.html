@@ -11,118 +11,66 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
         :root {
-            /* 🍵 Deep Matcha & Sand Palette */
-            --primary: #2d4f1e; /* 찐한 녹차색 */
-            --primary-light: #4a7c31; 
-            --accent: #a4c639; /* 포인트 연두색 */
-            --bg: #f5f5f0; /* 부드러운 미색 */
-            --card: rgba(255, 255, 255, 0.9);
-            --text: #1a2417; /* 아주 진한 녹갈색 */
-            --sub-text: #6b7260; 
-            --border: rgba(45, 79, 30, 0.1);
-            --dot: #d1d1c7;
+            --primary: #2d4f1e; --primary-light: #4a7c31; --accent: #a4c639;
+            --bg: #f5f5f0; --card: rgba(255, 255, 255, 0.9); --text: #1a2417;
+            --sub-text: #6b7260; --border: rgba(45, 79, 30, 0.1); --dot: #d1d1c7;
         }
 
         body.theme-dark { 
-            --primary: #a4c639; 
-            --primary-light: #c2e65d;
-            --bg: #121a0f; /* 다크 포레스트 배경 */
-            --card: rgba(30, 45, 25, 0.8); 
-            --text: #f1f5f0; 
-            --sub-text: #a4ad9c; 
-            --border: rgba(255, 255, 255, 0.05);
-            --dot: #2a3325;
+            --primary: #a4c639; --bg: #121a0f; --card: rgba(30, 45, 25, 0.8); 
+            --text: #f1f5f0; --sub-text: #a4ad9c; --border: rgba(255, 255, 255, 0.05);
         }
 
         body { 
             background-color: var(--bg); color: var(--text); font-family: 'Pretendard', sans-serif; 
-            margin: 0; padding: 60px 20px; display: flex; justify-content: center; transition: 0.4s;
+            margin: 0; padding: 60px 20px; display: flex; justify-content: center;
             background-image: radial-gradient(var(--dot) 1.5px, transparent 1.5px);
             background-size: 30px 30px; background-attachment: fixed;
+            user-select: none; /* 텍스트 선택 방지 (앱 느낌 강조) */
         }
 
-        .main-wrapper { width: 100%; max-width: 960px; display: none; z-index: 10; animation: fadeIn 0.8s ease; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
+        .main-wrapper { width: 100%; max-width: 960px; display: none; }
         .header { margin-bottom: 50px; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 32px; font-weight: 900; letter-spacing: -1.5px; margin: 0; color: var(--primary); }
-        .header h1 span { color: var(--accent); }
+        .header h1 { font-size: 32px; font-weight: 900; letter-spacing: -1.5px; color: var(--primary); }
 
         .stat-card { 
             background: var(--card); padding: 30px; border-radius: 32px; 
             border: 1px solid var(--border); backdrop-filter: blur(25px);
             box-shadow: 0 20px 50px rgba(45, 79, 30, 0.08);
-            position: relative;
         }
-        .stat-card label { font-size: 11px; font-weight: 800; color: var(--sub-text); letter-spacing: 1.5px; }
-        .stat-card b { font-size: 38px; display: block; margin-top: 8px; font-weight: 900; letter-spacing: -1px; }
 
-        /* ✨ 녹차색 테마 프로그레스 바 */
-        .progress-container { 
-            width: 100%; height: 16px; background: rgba(0,0,0,0.05); 
-            border-radius: 50px; overflow: hidden; margin-top: 25px;
-        }
-        #progress-bar { 
-            height: 100%; width: 0%; 
-            background: linear-gradient(90deg, var(--primary), var(--primary-light)); 
-            transition: 1.8s cubic-bezier(0.34, 1.56, 0.64, 1); 
-            border-radius: 50px; position: relative;
-        }
-        #progress-bar::after {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            animation: shine 3s infinite linear;
-        }
-        @keyframes shine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+        .progress-container { width: 100%; height: 16px; background: rgba(0,0,0,0.05); border-radius: 50px; overflow: hidden; margin-top: 25px; }
+        #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--primary), var(--primary-light)); transition: 1.8s cubic-bezier(0.34, 1.56, 0.64, 1); border-radius: 50px; }
 
-        .input-card { 
-            background: var(--card); padding: 25px; border-radius: 28px; 
-            display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; 
-            margin-bottom: 40px; border: 1px solid var(--border);
-        }
-        .input-card input { 
-            border: 1px solid var(--border); background: rgba(255,255,255,0.8); 
-            padding: 16px 20px; border-radius: 18px; outline: none; transition: 0.3s; 
-            color: var(--text); font-weight: 600;
-        }
-        .input-card input:focus { border-color: var(--primary); background: #fff; box-shadow: 0 0 0 5px rgba(45, 79, 30, 0.1); }
-        
-        .add-btn { 
-            background: var(--primary); color: #fff; border: none; padding: 0 35px; border-radius: 18px; 
-            font-weight: 900; cursor: pointer; transition: 0.4s;
-        }
-        .add-btn:hover { background: var(--primary-light); transform: translateY(-3px); box-shadow: 0 8px 20px rgba(45, 79, 30, 0.2); }
+        .input-card { background: var(--card); padding: 25px; border-radius: 28px; display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 15px; margin-bottom: 40px; border: 1px solid var(--border); }
+        .input-card input { border: 1px solid var(--border); background: rgba(255,255,255,0.8); padding: 16px 20px; border-radius: 18px; outline: none; color: var(--text); font-weight: 600; }
+        .add-btn { background: var(--primary); color: #fff; border: none; padding: 0 35px; border-radius: 18px; font-weight: 900; cursor: pointer; }
 
         #list { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; }
+        .item { background: var(--card); padding: 30px; border-radius: 35px; border: 1px solid var(--border); transition: 0.4s; position: relative; cursor: context-menu; }
+        .item:hover { transform: translateY(-5px); border-color: var(--primary); box-shadow: 0 15px 30px rgba(45, 79, 30, 0.05); }
 
-        .item { 
-            background: var(--card); padding: 30px; border-radius: 35px; 
-            border: 1px solid var(--border); backdrop-filter: blur(25px);
-            transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        .icon-box { width: 60px; height: 60px; border-radius: 20px; background: #fff; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; box-shadow: 4px 4px 15px rgba(0,0,0,0.03); }
+        .price-tag { font-size: 24px; font-weight: 900; margin-top: 20px; color: var(--primary); }
+
+        /* ✨ 세련된 커스텀 컨텍스트 메뉴 스타일 */
+        #context-menu {
+            position: fixed; display: none; background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(15px); border: 1px solid var(--border);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-radius: 18px;
+            width: 180px; z-index: 1000; padding: 10px;
+            animation: menuFade 0.2s ease;
         }
-        .item:hover { transform: translateY(-12px); box-shadow: 0 30px 60px rgba(45, 79, 30, 0.12); border-color: var(--accent); }
+        @keyframes menuFade { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
 
-        .icon-box {
-            width: 65px; height: 65px; border-radius: 22px;
-            background: #fff; display: flex; align-items: center; justify-content: center;
-            margin-bottom: 22px; box-shadow: 4px 4px 15px rgba(45, 79, 30, 0.05);
+        .menu-item {
+            padding: 10px 15px; display: flex; align-items: center; gap: 10px;
+            font-size: 14px; font-weight: 700; color: var(--sub-text);
+            cursor: pointer; border-radius: 12px; transition: 0.2s;
         }
-        body.theme-dark .icon-box { background: #1a2417; }
-
-        .project-name { font-weight: 900; font-size: 22px; margin-bottom: 15px; }
-        
-        .tag { 
-            font-size: 13px; font-weight: 700; color: var(--sub-text); 
-            background: rgba(45, 79, 30, 0.05); padding: 8px 14px; border-radius: 12px;
-            display: inline-flex; align-items: center; gap: 8px; margin-right: 8px;
-        }
-
-        .price-tag { font-size: 26px; font-weight: 900; margin: 25px 0; color: var(--primary); }
-        
-        .action-group { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.05); }
-        .st-select { border: none; background: rgba(0,0,0,0.05); padding: 10px 15px; border-radius: 12px; font-weight: 800; cursor: pointer; }
-        .del-btn { color: #d1d5db; cursor: pointer; border: none; background: none; transition: 0.3s; }
-        .del-btn:hover { color: #ff4d4f; transform: scale(1.2); }
+        .menu-item:hover { background: var(--primary); color: #fff; }
+        .menu-item.danger:hover { background: #ff4d4f; }
+        .menu-sep { height: 1px; background: var(--border); margin: 8px 5px; }
     </style>
 </head>
 <body>
@@ -130,26 +78,19 @@
 <div class="main-wrapper" id="main-wrapper">
     <div class="header">
         <h1 onclick="logout()" style="cursor:pointer;">iArch <span>Studio</span></h1>
-        <select onchange="changeTheme(this.value)" id="themeSelector" class="st-select">
-            <option value="default">🍵 Matcha Light</option>
-            <option value="dark">🌲 Forest Dark</option>
+        <select onchange="changeTheme(this.value)" class="st-select" style="border:none; background:none; font-weight:800; color:var(--sub-text);">
+            <option value="default">🍵 Matcha</option>
+            <option value="dark">🌲 Forest</option>
         </select>
     </div>
 
     <div style="display: grid; grid-template-columns: 1fr 1.6fr; gap: 25px; margin-bottom: 40px;">
         <div class="stat-card">
-            <label>ACCUMULATED REVENUE</label>
+            <label>REVENUE</label>
             <b id="sum-revenue">₩0</b>
-            <div style="font-size: 12px; color: var(--primary-light); font-weight: 800; margin-top: 15px; display: flex; align-items: center; gap: 6px;">
-                <span class="material-symbols-rounded" style="font-size: 18px;">park</span> Sustainable Growth
-            </div>
         </div>
-
         <div class="stat-card">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <label>OPERATIONAL PERFORMANCE</label>
-                <span id="active-info" style="font-size: 11px; font-weight: 900; color: white; background: var(--accent); padding: 4px 12px; border-radius: 10px;">0 ACTIVE</span>
-            </div>
+            <label>PROGRESS</label>
             <b id="progress-percent">0%</b>
             <div class="progress-container"><div id="progress-bar"></div></div>
         </div>
@@ -165,10 +106,17 @@
     <div id="list"></div>
 </div>
 
+<div id="context-menu">
+    <div class="menu-item" onclick="updateCtx('w')"><span class="material-symbols-rounded">schedule</span> Wait</div>
+    <div class="menu-item" onclick="updateCtx('i')"><span class="material-symbols-rounded">rocket_launch</span> Running</div>
+    <div class="menu-item" onclick="updateCtx('d')"><span class="material-symbols-rounded">check_circle</span> Done</div>
+    <div class="menu-sep"></div>
+    <div class="menu-item danger" onclick="removeCtx()"><span class="material-symbols-rounded">delete</span> Delete</div>
+</div>
+
 <div id="auth-section" style="text-align: center; margin-top: 30vh;">
-    <h1 style="font-weight:900; font-size: 48px; letter-spacing: -2px; color: var(--primary);">iArch <span>Console</span></h1>
-    <p style="color: var(--sub-text); font-weight: 600; margin-bottom: 30px;">Organic Architecture Management System</p>
-    <button onclick="login()" class="add-btn" style="padding:20px 50px; font-size: 18px;">Access Ledger</button>
+    <h1 style="font-weight:900; font-size: 48px; color: var(--primary);">iArch Console</h1>
+    <button onclick="login()" class="add-btn" style="padding:20px 50px; font-size: 18px; margin-top: 20px;">Access Ledger</button>
 </div>
 
 <script>
@@ -186,6 +134,7 @@
     const db = firebase.firestore();
     const auth = firebase.auth();
     let projects = [];
+    let selectedId = null; // 현재 우클릭한 아이템 ID 저장용
 
     function changeTheme(theme) {
         document.body.className = theme === 'default' ? '' : 'theme-' + theme;
@@ -215,7 +164,7 @@
         const list = document.getElementById('list');
         list.innerHTML = '';
         projects.forEach(o => {
-            let iconName = 'nature_people', iconColor = 'var(--sub-text)';
+            let iconName = 'hourglass_empty', iconColor = 'var(--sub-text)';
             if (o.s === 'i') { iconName = 'potted_plant'; iconColor = 'var(--primary)'; }
             if (o.s === 'd') { iconName = 'eco'; iconColor = 'var(--accent)'; }
 
@@ -223,33 +172,41 @@
             div.className = 'item';
             div.innerHTML = `
                 <div class="icon-box"><span class="material-symbols-rounded" style="color:${iconColor}; font-size:32px; font-variation-settings: 'FILL' 1;">${iconName}</span></div>
-                <div class="project-name">${o.p}</div>
-                <div class="info-tags">
-                    <div class="tag"><span class="material-symbols-rounded" style="font-size:16px;">person</span>${o.c}</div>
-                    <div class="tag"><span class="material-symbols-rounded" style="font-size:16px;">calendar_month</span>${o.date}</div>
-                </div>
+                <div class="project-name" style="font-weight:900; font-size:22px;">${o.p}</div>
+                <div style="font-size:14px; color:var(--sub-text); margin-top:10px; font-weight:700;">${o.c} · ${o.date}</div>
                 <div class="price-tag">₩${Number(o.v).toLocaleString()}</div>
-                <div class="action-group">
-                    <select onchange="updateStatus('${o.id}', this.value)" class="st-select">
-                        <option value="w" ${o.s==='w'?'selected':''}>Wait</option>
-                        <option value="i" ${o.s==='i'?'selected':''}>Running</option>
-                        <option value="d" ${o.s==='d'?'selected':''}>Done</option>
-                    </select>
-                    <button class="del-btn" onclick="remove('${o.id}')"><span class="material-symbols-rounded">delete</span></button>
-                </div>
             `;
+            
+            // ✨ 우클릭 이벤트 리스너 등록
+            div.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                selectedId = o.id;
+                const menu = document.getElementById('context-menu');
+                menu.style.display = 'block';
+                menu.style.left = e.pageX + 'px';
+                menu.style.top = e.pageY + 'px';
+            });
+            
             list.appendChild(div);
         });
         updateStats();
     }
 
+    // 메뉴 닫기 클릭 이벤트
+    window.addEventListener('click', () => {
+        document.getElementById('context-menu').style.display = 'none';
+    });
+
+    // 컨텍스트 메뉴용 함수들
+    function updateCtx(val) { if(selectedId) db.collection("iarch_ledger").doc(selectedId).update({ s: val }); }
+    function removeCtx() { if(selectedId && confirm('삭제할까요?')) db.collection("iarch_ledger").doc(selectedId).delete(); }
+
     function updateStats() {
-        const total = projects.length, done = projects.filter(o => o.s === 'd').length, live = projects.filter(o => o.s === 'i').length;
+        const total = projects.length, done = projects.filter(o => o.s === 'd').length;
         const rev = projects.filter(o => o.s === 'd').reduce((a, b) => a + Number(b.v), 0);
         document.getElementById('sum-revenue').innerText = '₩' + rev.toLocaleString();
         document.getElementById('progress-percent').innerText = total > 0 ? Math.round((done/total)*100)+'%' : '0%';
         document.getElementById('progress-bar').style.width = (total > 0 ? (done/total)*100 : 0) + '%';
-        document.getElementById('active-info').innerText = live + ' ACTIVE';
     }
 
     function add() {
@@ -262,8 +219,6 @@
         });
         p.value=''; c.value=''; v.value='';
     }
-    function updateStatus(id, val) { db.collection("iarch_ledger").doc(id).update({ s: val }); }
-    function remove(id) { if(confirm('삭제하시겠습니까?')) db.collection("iarch_ledger").doc(id).delete(); }
 </script>
 </body>
 </html>
