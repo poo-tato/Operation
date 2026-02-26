@@ -20,9 +20,23 @@
         body.theme-gold { --primary: #d97706; --bg: #fef3c7; --card: #ffffff; --text: #78350f; --sub-text: #fbbf24; --border: #fde68a; }
         body.theme-cyber { --primary: #00ff41; --bg: #000000; --card: #0d0d0d; --text: #00ff41; --sub-text: #008f11; --border: #003b00; }
 
-        body { background-color: var(--bg); color: var(--text); font-family: 'Pretendard', sans-serif; margin: 0; padding: 40px 20px; display: flex; justify-content: center; transition: 0.3s; }
-        .main-wrapper { width: 100%; max-width: 850px; display: none; }
+        /* ✨ 4번 기능: 커스텀 커서 (달러 모양) */
+        body { 
+            background-color: var(--bg); color: var(--text); font-family: 'Pretendard', sans-serif; 
+            margin: 0; padding: 40px 20px; display: flex; justify-content: center; transition: 0.3s;
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><text y="20" font-size="20">💰</text></svg>'), auto;
+        }
+        
+        /* 클릭 시 터지는 동전 애니메이션 스타일 */
+        .coin-effect {
+            position: fixed; pointer-events: none; font-size: 20px; animation: coin-up 0.8s ease-out forwards; z-index: 9999;
+        }
+        @keyframes coin-up {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-50px) scale(1.5); opacity: 0; }
+        }
 
+        .main-wrapper { width: 100%; max-width: 850px; display: none; }
         #auth-section { text-align: center; margin-top: 20vh; }
         .login-btn { background: var(--text); color: var(--bg); border: none; padding: 16px 32px; border-radius: 14px; font-weight: 700; cursor: pointer; font-size: 16px; }
 
@@ -43,7 +57,6 @@
         .input-card input { flex: 1; border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 12px 15px; border-radius: 12px; font-size: 14px; outline: none; }
         .add-btn { background: var(--primary); color: white; border: none; padding: 0 25px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-        /* 🔥 수정된 아이템 레이아웃 */
         .item { 
             background: var(--card); margin-bottom: 12px; padding: 18px 22px; border-radius: 20px; 
             display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); transition: 0.2s; 
@@ -51,12 +64,10 @@
         .info { flex: 2; min-width: 0; margin-right: 15px; }
         .info .title { font-weight: 700; font-size: 16px; color: var(--text); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .info .client { font-size: 12px; color: var(--sub-text); margin-top: 3px; display: block; }
-        
         .price { flex: 1; font-weight: 800; color: var(--text); font-size: 15px; text-align: right; margin-right: 20px; white-space: nowrap; }
         .action-group { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        
         .btn-copy { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 10px; font-size: 12px; cursor: pointer; }
-        .st-select { border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 8px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .st-select { width: 100px; border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 8px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body class="theme-default">
@@ -106,6 +117,17 @@
 </div>
 
 <script>
+    // ✨ 클릭 시 동전 이펙트 함수
+    window.addEventListener('click', (e) => {
+        const coin = document.createElement('div');
+        coin.className = 'coin-effect';
+        coin.innerText = '🪙';
+        coin.style.left = e.clientX + 'px';
+        coin.style.top = e.clientY + 'px';
+        document.body.appendChild(coin);
+        setTimeout(() => coin.remove(), 800);
+    });
+
     const firebaseConfig = {
         apiKey: "AIzaSyAP1bV3mqVQBPZn1CV_YQ0BlboJiIDkATs",
         authDomain: "operation-502d9.firebaseapp.com",
