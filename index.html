@@ -1,1 +1,152 @@
 
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>iArch Studio</title>
+    <style>
+        @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+        
+        body {
+            background-color: #f8fafc; /* 아주 연한 그레이 블루 */
+            color: #334155;
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            margin: 0; padding: 60px 20px;
+            display: flex; justify-content: center;
+        }
+
+        .main-wrapper { width: 100%; max-width: 800px; }
+
+        /* 헤더 섹션 */
+        .header { margin-bottom: 40px; text-align: left; }
+        .header h1 { font-size: 32px; font-weight: 800; color: #0f172a; margin: 0; }
+        .header p { color: #94a3b8; margin-top: 8px; font-size: 15px; }
+
+        /* 통계바: 가볍게 띄우기 */
+        .summary-bar {
+            display: flex; gap: 30px; margin-bottom: 40px;
+            padding: 10px; border-bottom: 2px solid #f1f5f9;
+        }
+        .summary-item b { color: #6366f1; font-size: 20px; }
+        .summary-item span { font-size: 14px; color: #64748b; margin-left: 5px; }
+
+        /* 입력 폼: 플로팅 카드 스타일 */
+        .input-card {
+            background: white; padding: 25px; border-radius: 20px;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05);
+            display: flex; gap: 12px; margin-bottom: 30px;
+        }
+        input {
+            flex: 1; border: none; background: #f1f5f9;
+            padding: 14px 18px; border-radius: 12px;
+            font-size: 14px; outline: none; transition: 0.2s;
+        }
+        input:focus { background: #e2e8f0; }
+        .add-btn {
+            background: #6366f1; color: white; border: none;
+            padding: 0 25px; border-radius: 12px; font-weight: 600;
+            cursor: pointer; transition: 0.2s;
+        }
+        .add-btn:hover { background: #4f46e5; transform: translateY(-2px); }
+
+        /* 리스트 아이템 */
+        .item {
+            background: white; margin-bottom: 12px; padding: 20px;
+            border-radius: 16px; display: flex; align-items: center;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.02);
+            transition: 0.2s;
+        }
+        .item:hover { transform: scale(1.01); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08); }
+        
+        .info { flex: 1; }
+        .info .title { font-weight: 700; font-size: 16px; color: #1e293b; display: block; }
+        .info .client { font-size: 13px; color: #94a3b8; margin-top: 2px; }
+
+        .price { font-weight: 600; margin-right: 25px; color: #475569; }
+
+        select {
+            border: none; background: #f1f5f9; padding: 8px 12px;
+            border-radius: 10px; font-size: 13px; font-weight: 600; color: #64748b;
+            cursor: pointer; outline: none;
+        }
+        .btn-del {
+            margin-left: 15px; background: none; border: none;
+            color: #fda4af; cursor: pointer; font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="main-wrapper">
+    <div class="header">
+        <h1>돈 많이 벌자 ㅎㅎ;</h1>
+        <p id="total-info">현재 진행 중인 프로젝트를 관리합니다.</p>
+    </div>
+
+    <div class="summary-bar">
+        <div class="summary-item"><b id="count-active">0</b><span>진행 중</span></div>
+        <div class="summary-item"><b id="sum-revenue">0</b><span>누적 매출</span></div>
+    </div>
+
+    <div class="input-card">
+        <input type="text" id="p" placeholder="프로젝트명">
+        <input type="text" id="c" placeholder="고객">
+        <input type="number" id="v" placeholder="금액">
+        <button class="add-btn" onclick="add()">추가하기</button>
+    </div>
+
+    <div id="list">
+        </div>
+</div>
+
+<script>
+    let db = JSON.parse(localStorage.getItem('iarch_vFinal')) || [];
+
+    function render() {
+        const list = document.getElementById('list');
+        list.innerHTML = '';
+        
+        db.forEach((o, i) => {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.innerHTML = `
+                <div class="info">
+                    <span class="title">${o.p}</span>
+                    <span class="client">Client. ${o.c}</span>
+                </div>
+                <div class="price">${Number(o.v).toLocaleString()}원</div>
+                <select onchange="st(${i}, this.value)">
+                    <option value="w" ${o.s==='w'?'selected':''}>대기</option>
+                    <option value="i" ${o.s==='i'?'selected':''}>진행</option>
+                    <option value="d" ${o.s==='d'?'selected':''}>완료</option>
+                </select>
+                <button class="btn-del" onclick="rm(${i})">삭제</button>
+            `;
+            list.appendChild(div);
+        });
+        updateStats();
+    }
+
+    function updateStats() {
+        const active = db.filter(o => o.s !== 'd').length;
+        const rev = db.filter(o => o.s === 'd').reduce((a, b) => a + Number(b.v), 0);
+        document.getElementById('count-active').innerText = active;
+        document.getElementById('sum-revenue').innerText = rev.toLocaleString() + '원';
+    }
+
+    function add() {
+        const p=document.getElementById('p'), c=document.getElementById('c'), v=document.getElementById('v');
+        if(!p.value || !c.value || !v.value) return;
+        db.push({p:p.value, c:c.value, v:v.value, s:'w'});
+        save(); p.value=''; c.value=''; v.value='';
+    }
+
+    function st(i,v){ db[i].s=v; save(); }
+    function rm(i){ if(confirm('삭제하시겠습니까?')){ db.splice(i,1); save(); } }
+    function save(){ localStorage.setItem('iarch_vFinal', JSON.stringify(db)); render(); }
+
+    render();
+</script>
+
+</body>
+</html>
