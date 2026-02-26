@@ -9,88 +9,90 @@
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
-        body { background-color: #f1f5f9; color: #334155; font-family: 'Pretendard', sans-serif; margin: 0; padding: 40px 20px; display: flex; justify-content: center; }
+        /* 테마 변수 설정 */
+        :root {
+            --primary: #6366f1;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text: #0f172a;
+            --sub-text: #64748b;
+            --border: #e2e8f0;
+        }
+
+        /* 테마별 색상 정의 */
+        body.theme-dark { --primary: #818cf8; --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --sub-text: #94a3b8; --border: #334155; }
+        body.theme-mint { --primary: #10b981; --bg: #ecfdf5; --card: #ffffff; --text: #064e3b; --sub-text: #34d399; --border: #d1fae5; }
+        body.theme-rose { --primary: #f43f5e; --bg: #fff1f2; --card: #ffffff; --text: #881337; --sub-text: #fb7185; --border: #ffe4e6; }
+        body.theme-gold { --primary: #d97706; --bg: #fef3c7; --card: #ffffff; --text: #78350f; --sub-text: #fbbf24; --border: #fde68a; }
+        body.theme-cyber { --primary: #00ff41; --bg: #000000; --card: #0d0d0d; --text: #00ff41; --sub-text: #008f11; --border: #003b00; }
+
+        body { background-color: var(--bg); color: var(--text); font-family: 'Pretendard', sans-serif; margin: 0; padding: 40px 20px; display: flex; justify-content: center; transition: 0.3s; }
         .main-wrapper { width: 100%; max-width: 850px; display: none; }
 
         #auth-section { text-align: center; margin-top: 20vh; }
-        .login-btn { background: #0f172a; color: white; border: none; padding: 16px 32px; border-radius: 14px; font-weight: 700; cursor: pointer; font-size: 16px; transition: 0.2s; }
-        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .login-btn { background: var(--text); color: var(--bg); border: none; padding: 16px 32px; border-radius: 14px; font-weight: 700; cursor: pointer; font-size: 16px; }
 
         .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 28px; font-weight: 800; color: #0f172a; margin: 0; cursor: pointer; }
-        #clock { font-size: 14px; color: #64748b; font-weight: 600; background: #fff; padding: 6px 12px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-
-        /* 대시보드 카드 스타일 */
-        .dashboard { display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; }
-        .stat-card label { display: block; font-size: 13px; color: #94a3b8; font-weight: 700; margin-bottom: 8px; }
-        .stat-card b { font-size: 24px; color: #0f172a; }
-
-        /* 진행률 바 */
-        .progress-container { width: 100%; height: 10px; background: #e2e8f0; border-radius: 10px; margin-top: 15px; overflow: hidden; }
-        #progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #6366f1, #a855f7); transition: 0.5s; }
-
-        .search-box { margin-bottom: 20px; position: relative; }
-        .search-box input { width: 100%; box-sizing: border-box; border: 2px solid #e2e8f0; background: #fff; padding: 14px 18px 14px 45px; border-radius: 16px; font-size: 14px; outline: none; transition: 0.2s; }
-        .search-box input:focus { border-color: #6366f1; }
-        .search-box::before { content: "🔍"; position: absolute; left: 18px; top: 14px; font-size: 16px; opacity: 0.5; }
-
-        .input-card { background: white; padding: 20px; border-radius: 20px; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.05); display: flex; gap: 10px; margin-bottom: 25px; border: 1px solid #e2e8f0; }
-        .input-card input { flex: 1; border: 1px solid #f1f5f9; background: #f8fafc; padding: 12px 15px; border-radius: 12px; font-size: 14px; outline: none; }
-        .input-card input:focus { background: #fff; border-color: #6366f1; }
-        .add-btn { background: #6366f1; color: white; border: none; padding: 0 25px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-
-        .item { background: white; margin-bottom: 12px; padding: 18px 22px; border-radius: 20px; display: flex; align-items: center; border: 1px solid #f1f5f9; transition: 0.2s; }
-        .item:hover { transform: scale(1.01); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        .info { flex: 1; }
-        .info .title { font-weight: 700; font-size: 16px; color: #1e293b; }
-        .info .client { font-size: 12px; color: #94a3b8; margin-top: 3px; display: block; }
-
-        .price { font-weight: 800; margin-right: 20px; color: #334155; font-size: 15px; }
+        .header h1 { font-size: 28px; font-weight: 800; color: var(--text); margin: 0; cursor: pointer; }
         
-        /* 버튼/상태 세트 */
-        .actions { display: flex; align-items: center; gap: 8px; }
-        select { border: 1px solid #e2e8f0; padding: 8px; border-radius: 10px; font-size: 12px; font-weight: 700; outline: none; }
-        .st-w { background: #f1f5f9; color: #64748b; }
-        .st-i { background: #eef2ff; color: #6366f1; border-color: #c7d2fe; }
-        .st-d { background: #ecfdf5; color: #10b981; border-color: #a7f3d0; }
+        /* 테마 드롭다운 */
+        .theme-select { border: 1px solid var(--border); background: var(--card); color: var(--text); padding: 8px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; outline: none; cursor: pointer; }
 
-        .btn-copy { background: #f8fafc; border: 1px solid #e2e8f0; padding: 8px 12px; border-radius: 10px; font-size: 12px; cursor: pointer; font-weight: 600; }
-        .btn-copy:hover { background: #e2e8f0; }
-        .btn-del { color: #cbd5e1; border: none; background: none; cursor: pointer; font-size: 12px; margin-left: 5px; }
-        .btn-del:hover { color: #f43f5e; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .stat-card label { color: var(--sub-text); font-size: 13px; font-weight: 700; margin-bottom: 8px; display: block; }
+        .stat-card b { color: var(--text); font-size: 24px; }
+
+        .input-card { background: var(--card); padding: 20px; border-radius: 20px; display: flex; gap: 10px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .input-card input { flex: 1; border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 12px 15px; border-radius: 12px; font-size: 14px; outline: none; }
+        .add-btn { background: var(--primary); color: white; border: none; padding: 0 25px; border-radius: 12px; font-weight: 700; cursor: pointer; }
+
+        .item { background: var(--card); margin-bottom: 12px; padding: 18px 22px; border-radius: 20px; display: flex; align-items: center; border: 1px solid var(--border); transition: 0.2s; }
+        .info .title { font-weight: 700; font-size: 16px; color: var(--text); }
+        .info .client { font-size: 12px; color: var(--sub-text); margin-top: 3px; display: block; }
+        .price { font-weight: 800; margin-right: 20px; color: var(--text); font-size: 15px; }
+
+        .progress-container { width: 100%; height: 10px; background: var(--border); border-radius: 10px; margin-top: 15px; overflow: hidden; }
+        #progress-bar { height: 100%; width: 0%; background: var(--primary); transition: 0.5s; }
+
+        .btn-copy { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 10px; font-size: 12px; cursor: pointer; }
+        select.st-select { border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 8px; border-radius: 10px; font-size: 12px; font-weight: 700; }
+        
+        .search-box input { width: 100%; box-sizing: border-box; border: 2px solid var(--border); background: var(--card); color: var(--text); padding: 14px 45px; border-radius: 16px; outline: none; margin-bottom: 20px; }
     </style>
 </head>
-<body>
+<body class="theme-default">
 
 <div id="auth-section">
     <h1>iArch Console</h1>
-    <p style="color:#94a3b8; margin-bottom:30px;">Cloud Production Mode</p>
     <button class="login-btn" onclick="login()">Google Login</button>
 </div>
 
 <div class="main-wrapper" id="main-wrapper">
     <div class="header">
         <h1 onclick="logout()">iArch Studio 💸</h1>
-        <div id="clock">00:00:00</div>
+        <select class="theme-select" onchange="changeTheme(this.value)" id="themeSelector">
+            <option value="default">🌐 라이트 모드</option>
+            <option value="dark">🌑 다크 모드</option>
+            <option value="mint">🌿 민트 포레스트</option>
+            <option value="rose">🌸 로즈 핑크</option>
+            <option value="gold">🧀 골드 치즈</option>
+            <option value="cyber">👽 사이버 펑크</option>
+        </select>
     </div>
 
-    <div class="dashboard">
+    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; margin-bottom: 25px;">
         <div class="stat-card">
-            <label>누적 매출 (완료기준)</label>
+            <label>누적 매출</label>
             <b id="sum-revenue">0원</b>
         </div>
         <div class="stat-card">
-            <label>전체 공정 진행률</label>
-            <div style="display:flex; justify-content:space-between; align-items: flex-end;">
-                <b id="progress-percent">0%</b>
-                <span style="font-size:12px; color:#94a3b8;" id="active-info">0건 진행 중</span>
-            </div>
+            <label>공정 진행률 <span id="active-info" style="float:right">0건</span></label>
+            <b id="progress-percent">0%</b>
             <div class="progress-container"><div id="progress-bar"></div></div>
         </div>
     </div>
 
-    <div class="search-box">
+    <div class="search-box" style="position:relative">
         <input type="text" id="searchInput" onkeyup="renderList()" placeholder="프로젝트 또는 고객명 검색...">
     </div>
 
@@ -105,6 +107,7 @@
 </div>
 
 <script>
+    // 파이어베이스 설정 (기존 본인 것 그대로 유지)
     const firebaseConfig = {
         apiKey: "AIzaSyAP1bV3mqVQBPZn1CV_YQ0BlboJiIDkATs",
         authDomain: "operation-502d9.firebaseapp.com",
@@ -121,6 +124,17 @@
     const provider = new firebase.auth.GoogleAuthProvider();
 
     let projects = [];
+
+    // 테마 변경 함수
+    function changeTheme(theme) {
+        document.body.className = theme === 'default' ? '' : 'theme-' + theme;
+        localStorage.setItem('iarch-theme', theme);
+    }
+
+    // 저장된 테마 불러오기
+    const savedTheme = localStorage.getItem('iarch-theme') || 'default';
+    changeTheme(savedTheme);
+    document.getElementById('themeSelector').value = savedTheme;
 
     auth.onAuthStateChanged(user => {
         if (user) {
@@ -143,37 +157,25 @@
         });
     }
 
-    // 클립보드 복사 함수
-    function copyInfo(p, c, v, s) {
-        const statusMsg = s === 'd' ? '✅ 작업 완료' : (s === 'i' ? '⚙️ 진행 중' : '⏳ 대기 중');
-        const text = `[iArch Studio]\n👤 고객명: ${c}\n📦 프로젝트: ${p}\n💰 금액: ₩${Number(v).toLocaleString()}\n📌 상태: ${statusMsg}`;
-        navigator.clipboard.writeText(text).then(() => alert('정산 정보가 복사되었습니다!'));
-    }
-
     function renderList() {
         const list = document.getElementById('list');
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         list.innerHTML = '';
-        
         const filtered = projects.filter(o => o.p.toLowerCase().includes(searchTerm) || o.c.toLowerCase().includes(searchTerm));
-
         filtered.forEach(o => {
             const div = document.createElement('div');
             div.className = 'item';
             div.innerHTML = `
-                <div class="info">
-                    <span class="title">${o.p}</span>
-                    <span class="client">👤 ${o.c} · 📅 ${o.date}</span>
-                </div>
+                <div class="info"><span class="title">${o.p}</span><span class="client">👤 ${o.c} · 📅 ${o.date}</span></div>
                 <div class="price">₩${Number(o.v).toLocaleString()}</div>
-                <div class="actions">
-                    <button class="btn-copy" onclick="copyInfo('${o.p}', '${o.c}', '${o.v}', '${o.s}')">Copy</button>
-                    <select onchange="updateStatus('${o.id}', this.value)" class="st-${o.s}">
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-copy" onclick="copyInfo('${o.p}','${o.c}','${o.v}','${o.s}')">Copy</button>
+                    <select onchange="updateStatus('${o.id}', this.value)" class="st-select">
                         <option value="w" ${o.s==='w'?'selected':''}>Pending</option>
                         <option value="i" ${o.s==='i'?'selected':''}>Running</option>
                         <option value="d" ${o.s==='d'?'selected':''}>Success</option>
                     </select>
-                    <button class="btn-del" onclick="remove('${o.id}')">×</button>
+                    <button onclick="remove('${o.id}')" style="background:none; border:none; color:var(--sub-text); cursor:pointer">×</button>
                 </div>
             `;
             list.appendChild(div);
@@ -182,36 +184,33 @@
     }
 
     function updateStats() {
-        const total = projects.length;
-        const done = projects.filter(o => o.s === 'd').length;
-        const running = projects.filter(o => o.s === 'i').length;
+        const total = projects.length, done = projects.filter(o => o.s === 'd').length, running = projects.filter(o => o.s === 'i').length;
         const rev = projects.filter(o => o.s === 'd').reduce((a, b) => a + Number(b.v), 0);
-
         const progress = total > 0 ? Math.round((done / total) * 100) : 0;
-        
         document.getElementById('sum-revenue').innerText = rev.toLocaleString() + '원';
         document.getElementById('progress-percent').innerText = progress + '%';
         document.getElementById('progress-bar').style.width = progress + '%';
         document.getElementById('active-info').innerText = `${running}건 진행 중`;
     }
 
+    function copyInfo(p, c, v, s) {
+        const statusMsg = s === 'd' ? '✅ 완료' : (s === 'i' ? '⚙️ 진행중' : '⏳ 대기');
+        const text = `[iArch Studio]\n고객: ${c}\n프젝: ${p}\n금액: ₩${Number(v).toLocaleString()}\n상태: ${statusMsg}`;
+        navigator.clipboard.writeText(text).then(() => alert('복사완료!'));
+    }
+
     function add() {
         const p=document.getElementById('p'), c=document.getElementById('c'), v=document.getElementById('v');
         if(!p.value || !c.value || !v.value) return;
-        const now = new Date();
         db.collection("iarch_ledger").add({
             p: p.value, c: c.value, v: v.value, s: 'w',
-            date: `${now.getMonth()+1}/${now.getDate()}`,
-            fullDate: now.toISOString()
+            date: `${new Date().getMonth()+1}/${new Date().getDate()}`,
+            fullDate: new Date().toISOString()
         });
         p.value=''; c.value=''; v.value='';
     }
-
     function updateStatus(id, val) { db.collection("iarch_ledger").doc(id).update({ s: val }); }
-    function remove(id) { if(confirm('기록을 삭제하시겠습니까?')) db.collection("iarch_ledger").doc(id).delete(); }
-
-    setInterval(() => { document.getElementById('clock').innerText = new Date().toLocaleTimeString(); }, 1000);
+    function remove(id) { if(confirm('삭제하시겠습니까?')) db.collection("iarch_ledger").doc(id).delete(); }
 </script>
-
 </body>
 </html>
