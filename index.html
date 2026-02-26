@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>iArch Core Console | Professional 3D</title>
+    <title>iArch Core Console | Fixed 3D</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -11,135 +11,100 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
         :root {
-            --primary: #3182f6; /* 토스 블루 스타일 */
-            --bg: #f1f5f9; --card: rgba(255, 255, 255, 0.9);
-            --text: #0f172a; --sub-text: #64748b; --border: #e2e8f0;
-            --shadow: rgba(0, 0, 0, 0.05);
+            --primary: #3182f6; --bg: #f1f5f9; --card: rgba(255, 255, 255, 0.9);
+            --text: #191f28; --sub-text: #64748b; --border: #e2e8f0;
         }
 
-        /* 기존 테마 시스템 유지 */
-        body.theme-dark { --primary: #5195f6; --bg: #0f172a; --card: rgba(30, 41, 59, 0.9); --text: #f1f5f9; --sub-text: #94a3b8; --border: #334155; --shadow: rgba(0, 0, 0, 0.3); }
-        body.theme-cyber { --primary: #00ff41; --bg: #000000; --card: rgba(13, 13, 13, 0.9); --text: #00ff41; --sub-text: #008f11; --border: #003b00; --shadow: rgba(0, 255, 65, 0.2); }
+        body.theme-dark { --primary: #5195f6; --bg: #0f172a; --card: rgba(30, 41, 59, 0.9); --text: #f1f5f9; --sub-text: #94a3b8; --border: #334155; }
+        body.theme-cyber { --primary: #00ff41; --bg: #000000; --card: rgba(13, 13, 13, 0.9); --text: #00ff41; --sub-text: #008f11; --border: #003b00; }
 
         body { 
             background-color: var(--bg); color: var(--text); font-family: 'Pretendard', sans-serif; 
-            margin: 0; padding: 60px 20px; display: flex; justify-content: center; transition: 0.3s;
-            perspective: 2000px; /* 전체 3D 원근감 */
-            
-            /* ✨ 포인트 1: 배경 이미지 (디지털 그리드 & 입체 파티클 패턴) */
-            background-image: 
-                radial-gradient(var(--border) 1px, transparent 1px),
-                linear-gradient(var(--border) 1px, transparent 1px),
-                linear-gradient(90deg, var(--border) 1px, transparent 1px);
-            background-size: 40px 40px, 80px 80px, 80px 80px;
-            background-position: center center;
-            background-blend-mode: overlay;
+            margin: 0; padding: 40px 20px; display: flex; justify-content: center; transition: 0.3s;
+            /* 배경 그리드 유지 */
+            background-image: radial-gradient(var(--border) 1px, transparent 1px);
+            background-size: 40px 40px;
         }
 
-        .main-wrapper { 
-            width: 100%; max-width: 850px; display: none; 
-            /* ✨ 제어판 자체가 살짝 떠 있는 효과 */
-            transform-style: preserve-3d;
-            transform: translateZ(10px);
-        }
+        .main-wrapper { width: 100%; max-width: 800px; display: none; }
         
-        /* 기존 헤더 & 통계 섹션 (디자인 유지) */
-        .header { margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 32px; font-weight: 900; letter-spacing: -1px; margin: 0; cursor: pointer; }
-        .theme-select { border: 1px solid var(--border); background: var(--card); color: var(--text); padding: 10px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-
-        .stat-card { background: var(--card); padding: 25px; border-radius: 25px; border: 1px solid var(--border); transition: 0.3s; backdrop-filter: blur(10px); }
-        .stat-card:hover { transform: translateY(-5px) translateZ(30px); box-shadow: 0 20px 40px var(--shadow); }
-        .stat-card label { font-size: 13px; color: var(--sub-text); font-weight: 700; display: block; margin-bottom: 8px; }
-        .stat-card b { font-size: 28px; }
-        .progress-container { width: 100%; height: 10px; background: var(--border); border-radius: 10px; margin-top: 15px; overflow: hidden; }
+        .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--border); backdrop-filter: blur(10px); }
+        .progress-container { width: 100%; height: 8px; background: var(--border); border-radius: 10px; margin-top: 10px; overflow: hidden; }
         #progress-bar { height: 100%; width: 0%; background: var(--primary); transition: 0.5s; }
 
-        /* 기존 검색 & 입력 섹션 (디자인 유지) */
-        .search-box input { width: 100%; box-sizing: border-box; border: 2px solid var(--border); background: var(--card); color: var(--text); padding: 16px 20px; border-radius: 18px; outline: none; margin-bottom: 25px; transition: 0.3s; }
-        .search-box input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(49, 130, 246, 0.1); }
-        .input-card { background: var(--card); padding: 25px; border-radius: 25px; display: flex; gap: 10px; margin-bottom: 30px; border: 1px solid var(--border); backdrop-filter: blur(10px); }
-        .input-card input { flex: 1; border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 14px; border-radius: 14px; font-size: 15px; outline: none; }
-        .add-btn { background: var(--primary); color: white; border: none; padding: 0 30px; border-radius: 14px; font-weight: 800; cursor: pointer; transition: 0.3s; }
-        .add-btn:hover { transform: scale(1.05); filter: brightness(1.1); }
+        .input-card { background: var(--card); padding: 20px; border-radius: 20px; display: flex; gap: 10px; margin-bottom: 25px; border: 1px solid var(--border); position: relative; z-index: 100; }
+        .input-card input { flex: 1; border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 12px; border-radius: 12px; outline: none; }
+        .add-btn { background: var(--primary); color: white; border: none; padding: 0 20px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-        /* ✨ 3D 아이템 리스트 (Toss-like Haptic) */
+        /* ✨ 3D 리스트 영역 최적화 */
+        #list { perspective: 1000px; } /* 원근감을 이 영역으로 제한 */
+
         .item { 
-            background: var(--card); margin-bottom: 18px; padding: 25px 30px; border-radius: 28px; 
+            background: var(--card); margin-bottom: 15px; padding: 20px; border-radius: 22px; 
             display: flex; align-items: center; border: 1px solid var(--border);
-            backdrop-filter: blur(10px);
-            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
             transform-style: preserve-3d;
-            box-shadow: 0 10px 20px var(--shadow);
-        }
-        .item:hover {
-            transform: translateZ(50px) rotateX(-2deg) rotateY(2deg);
-            box-shadow: 0 30px 60px var(--shadow);
-            border-color: var(--primary);
+            position: relative;
         }
 
-        /* ✨ 포인트 2: 아이콘 변경 및 초고화질 3D 스타일링 */
-        .icon-box {
-            width: 60px; height: 60px; border-radius: 18px;
-            background: linear-gradient(145deg, #ffffff, #e6e6e6);
-            display: flex; align-items: center; justify-content: center;
-            margin-right: 25px; transform: translateZ(30px);
-            box-shadow: 5px 5px 15px #d1d1d1, -5px -5px 15px #ffffff;
+        /* 호버 시에만 살짝 띄우기 (클릭 방해 방지) */
+        .item:hover {
+            transform: translateZ(20px) rotateX(-1deg);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
         }
-        /* 테마별 아이콘 박스 그림자 조절 */
-        body.theme-dark .icon-box { background: var(--card); box-shadow: 5px 5px 15px #0a0e14, -5px -5px 15px #263448; }
-        body.theme-cyber .icon-box { background: var(--card); box-shadow: 0 0 15px var(--primary); border: 1px solid var(--primary); }
+
+        .icon-box {
+            width: 50px; height: 50px; border-radius: 14px;
+            background: var(--bg); display: flex; align-items: center; justify-content: center;
+            margin-right: 15px; flex-shrink: 0;
+            pointer-events: none; /* 아이콘 박스가 클릭을 방해하지 않도록 설정 */
+        }
 
         .material-symbols-rounded {
-            font-size: 36px;
-            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
-            /* 빛을 받는 입체적인 그래디언트 */
-            background: linear-gradient(to bottom right, var(--primary), #1e4bd9);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            /* 입체 그림자 */
-            filter: drop-shadow(0 4px 6px rgba(0,0,0,0.2));
+            font-size: 30px; color: var(--primary);
+            font-variation-settings: 'FILL' 1;
         }
-        body.theme-cyber .material-symbols-rounded { background: var(--primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 5px var(--primary)); }
 
-        .info { flex: 2; min-width: 0; transform: translateZ(20px); }
-        .price { flex: 1; font-weight: 800; color: var(--text); font-size: 20px; text-align: right; margin-right: 20px; transform: translateZ(35px); }
-        .action-group { display: flex; align-items: center; gap: 8px; transform: translateZ(25px); }
+        .info { flex: 1; min-width: 0; }
+        .price { font-weight: 800; margin: 0 15px; white-space: nowrap; }
         
-        .st-select { border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 10px; border-radius: 12px; font-size: 13px; font-weight: 700; cursor: pointer; }
+        /* ✨ 셀렉트 박스 & 버튼 클릭 가능하도록 최상단 배치 */
+        .action-group { display: flex; align-items: center; gap: 10px; position: relative; z-index: 50; }
+        .st-select { 
+            border: 1px solid var(--border); background: var(--bg); color: var(--text); 
+            padding: 8px; border-radius: 10px; font-weight: 700; cursor: pointer;
+            position: relative;
+        }
     </style>
 </head>
 <body class="theme-default">
 
 <div class="main-wrapper" id="main-wrapper">
     <div class="header">
-        <h1 onclick="logout()" style="cursor:pointer;">iArch Console <span style="color:var(--primary)">3D</span></h1>
-        <select class="theme-select" onchange="changeTheme(this.value)" id="themeSelector">
-            <option value="default">🌐 라이트</option>
-            <option value="dark">🌑 다크</option>
-            <option value="cyber">👽 사이버</option>
+        <h1 onclick="logout()" style="cursor:pointer; margin:0; font-size:28px;">iArch <span style="color:var(--primary)">Studio</span></h1>
+        <select onchange="changeTheme(this.value)" id="themeSelector" style="padding:5px; border-radius:8px;">
+            <option value="default">🌐 Light</option>
+            <option value="dark">🌑 Dark</option>
+            <option value="cyber">👽 Cyber</option>
         </select>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; margin-bottom: 30px;">
+    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; margin-bottom: 20px;">
         <div class="stat-card">
-            <label>누적 매출</label>
-            <b id="sum-revenue">0원</b>
+            <label style="font-size:11px; color:var(--sub-text);">누적 매출</label><br>
+            <b id="sum-revenue" style="font-size:20px;">0원</b>
         </div>
         <div class="stat-card">
-            <label>공정 진행률 <span id="active-info" style="float:right">0건</span></label>
-            <b id="progress-percent">0%</b>
+            <label style="font-size:11px; color:var(--sub-text);">진행률</label>
+            <b id="progress-percent" style="float:right">0%</b>
             <div class="progress-container"><div id="progress-bar"></div></div>
         </div>
     </div>
 
-    <div class="search-box">
-        <input type="text" id="searchInput" onkeyup="renderList()" placeholder="프로젝트 또는 고객명 검색...">
-    </div>
-
     <div class="input-card">
-        <input type="text" id="p" placeholder="프로젝트명">
-        <input type="text" id="c" placeholder="고객 닉네임">
+        <input type="text" id="p" placeholder="프로젝트">
+        <input type="text" id="c" placeholder="고객">
         <input type="number" id="v" placeholder="금액">
         <button class="add-btn" onclick="add()">DEPLOY</button>
     </div>
@@ -149,11 +114,10 @@
 
 <div id="auth-section" style="text-align: center; margin-top: 30vh;">
     <h1>iArch Console</h1>
-    <button onclick="login()" style="background:var(--primary); color:#fff; border:none; padding:18px 40px; border-radius:15px; cursor:pointer; font-weight:800; font-size:18px;">Login Google Console</button>
+    <button onclick="login()" style="padding:15px 30px; border-radius:12px; cursor:pointer; background:var(--primary); color:white; border:none; font-weight:bold;">Google Login</button>
 </div>
 
 <script>
-    /* 기존 파이어베이스 설정 및 로직 유지 */
     const firebaseConfig = {
         apiKey: "AIzaSyAP1bV3mqVQBPZn1CV_YQ0BlboJiIDkATs",
         authDomain: "operation-502d9.firebaseapp.com",
@@ -167,7 +131,6 @@
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
     const auth = firebase.auth();
-
     let projects = [];
 
     function changeTheme(theme) {
@@ -194,34 +157,22 @@
         });
     }
 
-    // ✨ 3D화된 리스트 렌더링 (아이콘 변경 및 입체 스타일링)
     function renderList() {
         const list = document.getElementById('list');
-        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         list.innerHTML = '';
         
-        const filtered = projects.filter(o => o.p.toLowerCase().includes(searchTerm) || o.c.toLowerCase().includes(searchTerm));
-
-        filtered.forEach(o => {
-            // ✨ 상태별 SDK 아이콘 변경 (글리프 변경)
-            let iconName = 'hourglass_empty'; // Pending (대기)
-            if (o.s === 'i') iconName = 'rocket_launch'; // Running (진행)
-            if (o.s === 'd') iconName = 'check_circle'; // Done (완료)
-            
-            // 제목 키워드에 따라 아이콘 세분화 (선택사항)
-            if (o.p.includes('서버') || o.p.includes('개발')) iconName = 'terminal';
-            if (o.p.includes('보안') || o.p.includes('인증')) iconName = 'shield_with_heart';
-            if (o.p.includes('클라우드') || o.p.includes('데이터')) iconName = 'cloud_download';
+        projects.forEach(o => {
+            let iconName = 'hourglass_empty';
+            if (o.s === 'i') iconName = 'rocket_launch';
+            if (o.s === 'd') iconName = 'check_circle';
 
             const div = document.createElement('div');
             div.className = 'item';
             div.innerHTML = `
-                <div class="icon-box">
-                    <span class="material-symbols-rounded">${iconName}</span>
-                </div>
+                <div class="icon-box"><span class="material-symbols-rounded">${iconName}</span></div>
                 <div class="info">
-                    <span style="font-weight:700; font-size:18px; letter-spacing:-0.5px;">${o.p}</span><br>
-                    <span style="font-size:13px; color:var(--sub-text);">👤 ${o.c} · 📅 ${o.date}</span>
+                    <div style="font-weight:700; font-size:16px;">${o.p}</div>
+                    <div style="font-size:12px; color:var(--sub-text);">${o.c} · ${o.date}</div>
                 </div>
                 <div class="price">₩${Number(o.v).toLocaleString()}</div>
                 <div class="action-group">
@@ -230,7 +181,7 @@
                         <option value="i" ${o.s==='i'?'selected':''}>Live</option>
                         <option value="d" ${o.s==='d'?'selected':''}>Done</option>
                     </select>
-                    <button onclick="remove('${o.id}')" style="background:none; border:none; color:var(--sub-text); cursor:pointer; font-size:20px;">×</button>
+                    <button onclick="remove('${o.id}')" style="background:none; border:none; color:#ccc; cursor:pointer; font-size:18px;">×</button>
                 </div>
             `;
             list.appendChild(div);
@@ -238,14 +189,12 @@
         updateStats();
     }
 
-    /* 기존 통계 및 관리 로직 유지 */
     function updateStats() {
-        const total = projects.length, done = projects.filter(o => o.s === 'd').length, running = projects.filter(o => o.s === 'i').length;
+        const total = projects.length, done = projects.filter(o => o.s === 'd').length;
         const rev = projects.filter(o => o.s === 'd').reduce((a, b) => a + Number(b.v), 0);
         document.getElementById('sum-revenue').innerText = rev.toLocaleString() + '원';
         document.getElementById('progress-percent').innerText = total > 0 ? Math.round((done/total)*100)+'%' : '0%';
         document.getElementById('progress-bar').style.width = (total > 0 ? (done/total)*100 : 0) + '%';
-        document.getElementById('active-info').innerText = running + '건 진행 중';
     }
 
     function add() {
@@ -259,14 +208,7 @@
         p.value=''; c.value=''; v.value='';
     }
     function updateStatus(id, val) { db.collection("iarch_ledger").doc(id).update({ s: val }); }
-    function remove(id) { if(confirm('삭제하시겠습니까?')) db.collection("iarch_ledger").doc(id).delete(); }
-
-    window.addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
-            e.preventDefault();
-            // 퀵커맨드 팔레트는 사용자님 원본 소스엔 없어서 이번엔 빼고, 아이콘과 배경만 집중했습니다.
-        }
-    });
+    function remove(id) { if(confirm('삭제?')) db.collection("iarch_ledger").doc(id).delete(); }
 </script>
 </body>
 </html>
