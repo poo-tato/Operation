@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>iArch Professional 3D</title>
+    <title>iArch Studio Cloud 3D</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -11,98 +11,117 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
         :root {
-            --primary: #3182f6; --bg: #f2f4f6; --card: rgba(255, 255, 255, 0.8);
-            --text: #191f28; --sub-text: #8b95a1; --border: #e5e8eb;
+            --primary: #6366f1; --bg: #f1f5f9; --card: #ffffff;
+            --text: #0f172a; --sub-text: #64748b; --border: #e2e8f0;
         }
+
+        /* 기존 테마들 유지 */
+        body.theme-dark { --primary: #818cf8; --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --sub-text: #94a3b8; --border: #334155; }
+        body.theme-cyber { --primary: #00ff41; --bg: #000000; --card: #0d0d0d; --text: #00ff41; --sub-text: #008f11; --border: #003b00; }
 
         body { 
             background-color: var(--bg); color: var(--text); font-family: 'Pretendard', sans-serif; 
-            margin: 0; padding: 40px; display: flex; flex-direction: column; align-items: center;
-            perspective: 2000px; /* 전역 3D 원근감 */
+            margin: 0; padding: 40px 20px; display: flex; justify-content: center; transition: 0.3s;
+            perspective: 1200px; /* 전체 3D 원근감 */
         }
 
-        .main-wrapper { width: 100%; max-width: 1100px; display: none; }
+        .main-wrapper { width: 100%; max-width: 850px; display: none; }
+        
+        /* 헤더 & 통계 (기존 디자인 유지) */
+        .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--border); transition: 0.3s; }
+        .stat-card:hover { transform: translateY(-5px) translateZ(20px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+        .progress-container { width: 100%; height: 10px; background: var(--border); border-radius: 10px; margin-top: 15px; overflow: hidden; }
+        #progress-bar { height: 100%; width: 0%; background: var(--primary); transition: 0.5s; }
 
-        /* ✨ 3D 카드 그리드 */
-        #list {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 30px; padding: 40px 0;
-        }
+        /* 입력 카드 & 검색 (기존 디자인 유지) */
+        .search-box input { width: 100%; box-sizing: border-box; border: 2px solid var(--border); background: var(--card); color: var(--text); padding: 14px 20px; border-radius: 16px; outline: none; margin-bottom: 20px; }
+        .input-card { background: var(--card); padding: 20px; border-radius: 20px; display: flex; gap: 10px; margin-bottom: 25px; border: 1px solid var(--border); }
+        .input-card input { flex: 1; border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 12px 15px; border-radius: 12px; font-size: 14px; outline: none; }
+        .add-btn { background: var(--primary); color: white; border: none; padding: 0 25px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-        /* ✨ 토스식 Glassmorphism 카드 */
+        /* ✨ 3D 아이템 리스트 */
         .item { 
-            background: var(--card); border: 1px solid var(--border); border-radius: 24px;
-            padding: 30px; backdrop-filter: blur(10px);
+            background: var(--card); margin-bottom: 15px; padding: 20px 25px; border-radius: 22px; 
+            display: flex; align-items: center; border: 1px solid var(--border);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             transform-style: preserve-3d;
-            transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.03);
-            display: flex; flex-direction: column; gap: 15px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
         }
-
         .item:hover {
-            transform: translateZ(40px) rotateX(-5deg) rotateY(5deg);
-            box-shadow: 0 30px 60px rgba(0,0,0,0.1);
+            transform: translateZ(40px) rotateX(-2deg);
+            box-shadow: 0 20px 30px rgba(0,0,0,0.1);
             border-color: var(--primary);
         }
 
-        /* ✨ SDK 기반 3D 아이콘 스타일링 */
-        .icon-wrapper {
-            width: 60px; height: 60px; border-radius: 18px;
-            background: linear-gradient(145deg, #ffffff, #e6e6e6);
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 5px 5px 15px #d1d1d1, -5px -5px 15px #ffffff;
-            transform: translateZ(30px); /* 아이콘을 카드 위로 띄움 */
-            margin-bottom: 10px;
+        /* ✨ 3D 아이콘 스타일 (SDK 활용) */
+        .icon-box {
+            width: 54px; height: 54px; border-radius: 15px;
+            background: var(--bg); display: flex; align-items: center; justify-content: center;
+            margin-right: 20px; transform: translateZ(20px);
+            box-shadow: inset 2px 2px 5px rgba(0,0,0,0.05);
         }
-
         .material-symbols-rounded {
-            font-size: 35px;
+            font-size: 32px;
             font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 48;
-            background: linear-gradient(to bottom right, var(--primary), #1e4bd9);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            /* 입체 그림자 */
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
+            color: var(--primary);
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
         }
 
-        .price { font-size: 26px; font-weight: 800; transform: translateZ(50px); }
-        .info-text { transform: translateZ(20px); }
+        .info { flex: 2; min-width: 0; transform: translateZ(10px); }
+        .price { flex: 1; font-weight: 800; color: var(--text); font-size: 17px; text-align: right; margin-right: 15px; transform: translateZ(25px); }
+        .action-group { display: flex; align-items: center; gap: 8px; transform: translateZ(15px); }
         
-        /* 상단 통계 디자인 */
-        .dashboard {
-            width: 100%; background: #fff; border-radius: 24px; padding: 30px;
-            display: flex; justify-content: space-around; margin-bottom: 30px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-        }
-        .stat-item { text-align: center; }
-        .stat-item span { font-size: 13px; color: var(--sub-text); font-weight: 600; }
-        .stat-item div { font-size: 24px; font-weight: 800; margin-top: 5px; }
-
-        input { width: 100%; border: 1px solid var(--border); padding: 15px; border-radius: 15px; font-size: 16px; outline: none; transition: 0.3s; }
-        input:focus { border-color: var(--primary); box-shadow: 0 0 0 4px rgba(49, 130, 246, 0.1); }
+        .st-select { border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 8px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .coin-effect { position: fixed; pointer-events: none; animation: coin-up 0.8s ease-out forwards; z-index: 9999; }
+        @keyframes coin-up { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-50px); opacity: 0; } }
     </style>
 </head>
-<body>
-
-<div id="auth-section" style="text-align:center; margin-top:20vh;">
-    <h1 style="font-weight:900; font-size:48px; letter-spacing:-1px;">iArch <span style="color:var(--primary)">3D</span></h1>
-    <button onclick="login()" style="background:var(--primary); color:#fff; border:none; padding:18px 40px; border-radius:18px; font-weight:800; cursor:pointer; font-size:18px;">시작하기</button>
-</div>
+<body class="theme-default">
 
 <div class="main-wrapper" id="main-wrapper">
-    <div class="dashboard">
-        <div class="stat-item"><span>누적 매출</span><div id="sum-revenue" style="color:var(--primary)">0원</div></div>
-        <div class="stat-item"><span>진행 중</span><div id="active-info">0건</div></div>
-        <div class="stat-item"><span>완료율</span><div id="progress-percent">0%</div></div>
+    <div class="header">
+        <h1 onclick="logout()" style="cursor:pointer;">iArch Studio 💸</h1>
+        <select class="theme-select" onchange="changeTheme(this.value)" id="themeSelector" style="padding:8px; border-radius:10px;">
+            <option value="default">🌐 라이트</option>
+            <option value="dark">🌑 다크</option>
+            <option value="cyber">👽 사이버</option>
+        </select>
     </div>
 
-    <input type="text" id="searchInput" onkeyup="renderList()" placeholder="프로젝트를 입체적으로 검색해보세요">
+    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; margin-bottom: 25px;">
+        <div class="stat-card">
+            <label style="font-size:12px; color:var(--sub-text);">누적 매출</label><br>
+            <b id="sum-revenue" style="font-size:24px;">0원</b>
+        </div>
+        <div class="stat-card">
+            <label style="font-size:12px; color:var(--sub-text);">공정 진행률 <span id="active-info" style="float:right">0건</span></label>
+            <b id="progress-percent">0%</b>
+            <div class="progress-container"><div id="progress-bar"></div></div>
+        </div>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="searchInput" onkeyup="renderList()" placeholder="프로젝트 또는 고객명 검색...">
+    </div>
+
+    <div class="input-card">
+        <input type="text" id="p" placeholder="프로젝트명">
+        <input type="text" id="c" placeholder="고객 닉네임">
+        <input type="number" id="v" placeholder="금액">
+        <button class="add-btn" onclick="add()">DEPLOY</button>
+    </div>
 
     <div id="list"></div>
 </div>
 
+<div id="auth-section" style="text-align: center; margin-top: 20vh;">
+    <h1>iArch Console</h1>
+    <button onclick="login()" style="padding:15px 30px; border-radius:12px; cursor:pointer; font-weight:bold;">Google Login</button>
+</div>
+
 <script>
+    /* 파이어베이스 설정 및 기존 로직 (복사/붙여넣기) */
     const firebaseConfig = {
         apiKey: "AIzaSyAP1bV3mqVQBPZn1CV_YQ0BlboJiIDkATs",
         authDomain: "operation-502d9.firebaseapp.com",
@@ -119,6 +138,12 @@
 
     let projects = [];
 
+    function changeTheme(theme) {
+        document.body.className = theme === 'default' ? '' : 'theme-' + theme;
+        localStorage.setItem('iarch-theme', theme);
+    }
+    changeTheme(localStorage.getItem('iarch-theme') || 'default');
+
     auth.onAuthStateChanged(user => {
         if (user) {
             document.getElementById('auth-section').style.display = 'none';
@@ -128,6 +153,7 @@
     });
 
     function login() { auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }
+    function logout() { if(confirm('로그아웃?')) auth.signOut().then(()=>location.reload()); }
 
     function syncData() {
         db.collection("iarch_ledger").orderBy("fullDate", "desc").onSnapshot(snapshot => {
@@ -136,38 +162,38 @@
         });
     }
 
+    // ✨ 3D화된 리스트 렌더링 (기존 기능 유지하면서 아이콘 추가)
     function renderList() {
         const list = document.getElementById('list');
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         list.innerHTML = '';
         
-        const filtered = projects.filter(o => o.p.toLowerCase().includes(searchTerm));
+        const filtered = projects.filter(o => o.p.toLowerCase().includes(searchTerm) || o.c.toLowerCase().includes(searchTerm));
 
         filtered.forEach(o => {
-            // ✨ 상태별 SDK 아이콘 매핑
-            let iconName = 'hourglass_empty'; // 대기
-            if (o.s === 'i') iconName = 'rocket_launch'; // 진행
-            if (o.s === 'd') iconName = 'payments'; // 완료
+            // ✨ 상태별 SDK 아이콘 선택
+            let iconName = 'schedule'; // Pending
+            if (o.s === 'i') iconName = 'rocket_launch'; // Running
+            if (o.s === 'd') iconName = 'check_circle'; // Done
 
             const div = document.createElement('div');
             div.className = 'item';
             div.innerHTML = `
-                <div class="icon-wrapper">
+                <div class="icon-box">
                     <span class="material-symbols-rounded">${iconName}</span>
                 </div>
-                <div class="info-text">
-                    <div style="font-size:12px; color:var(--sub-text); font-weight:700; margin-bottom:4px;">${o.date}</div>
-                    <div style="font-size:20px; font-weight:800; letter-spacing:-0.5px;">${o.p}</div>
-                    <div style="font-size:14px; color:var(--sub-text); margin-top:2px;">고객: ${o.c}</div>
+                <div class="info">
+                    <span style="font-weight:700; font-size:16px;">${o.p}</span><br>
+                    <span style="font-size:12px; color:var(--sub-text);">👤 ${o.c} · 📅 ${o.date}</span>
                 </div>
                 <div class="price">₩${Number(o.v).toLocaleString()}</div>
-                <div style="display:flex; justify-content:space-between; align-items:center; margin-top:10px;">
-                    <select onchange="updateStatus('${o.id}', this.value)" style="border:none; background:var(--bg); padding:8px 12px; border-radius:10px; font-weight:700; cursor:pointer;">
-                        <option value="w" ${o.s==='w'?'selected':''}>대기</option>
-                        <option value="i" ${o.s==='i'?'selected':''}>진행</option>
-                        <option value="d" ${o.s==='d'?'selected':''}>완료</option>
+                <div class="action-group">
+                    <select onchange="updateStatus('${o.id}', this.value)" class="st-select">
+                        <option value="w" ${o.s==='w'?'selected':''}>Wait</option>
+                        <option value="i" ${o.s==='i'?'selected':''}>Live</option>
+                        <option value="d" ${o.s==='d'?'selected':''}>Done</option>
                     </select>
-                    <button onclick="remove('${o.id}')" style="background:none; border:none; color:#ddd; cursor:pointer;">삭제</button>
+                    <button onclick="remove('${o.id}')" style="background:none; border:none; color:var(--sub-text); cursor:pointer; font-size:18px;">×</button>
                 </div>
             `;
             list.appendChild(div);
@@ -180,9 +206,20 @@
         const rev = projects.filter(o => o.s === 'd').reduce((a, b) => a + Number(b.v), 0);
         document.getElementById('sum-revenue').innerText = rev.toLocaleString() + '원';
         document.getElementById('progress-percent').innerText = total > 0 ? Math.round((done/total)*100)+'%' : '0%';
-        document.getElementById('active-info').innerText = running + '건';
+        document.getElementById('progress-bar').style.width = (total > 0 ? (done/total)*100 : 0) + '%';
+        document.getElementById('active-info').innerText = running + '건 진행 중';
     }
 
+    function add() {
+        const p=document.getElementById('p'), c=document.getElementById('c'), v=document.getElementById('v');
+        if(!p.value || !c.value || !v.value) return;
+        db.collection("iarch_ledger").add({
+            p: p.value, c: c.value, v: v.value, s: 'w',
+            date: `${new Date().getMonth()+1}/${new Date().getDate()}`,
+            fullDate: new Date().toISOString()
+        });
+        p.value=''; c.value=''; v.value='';
+    }
     function updateStatus(id, val) { db.collection("iarch_ledger").doc(id).update({ s: val }); }
     function remove(id) { if(confirm('삭제하시겠습니까?')) db.collection("iarch_ledger").doc(id).delete(); }
 </script>
