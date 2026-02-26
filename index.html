@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>iArch Studio Cloud</title>
+    <title>iArch Studio | 3D Cloud Console</title>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
@@ -10,133 +10,156 @@
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
         :root {
-            --primary: #6366f1; --bg: #f1f5f9; --card: #ffffff;
+            --primary: #6366f1; --bg: #f8fafc; --card: #ffffff;
             --text: #0f172a; --sub-text: #64748b; --border: #e2e8f0;
+            --shadow: rgba(0, 0, 0, 0.1);
         }
 
-        body.theme-dark { --primary: #818cf8; --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --sub-text: #94a3b8; --border: #334155; }
-        body.theme-mint { --primary: #10b981; --bg: #ecfdf5; --card: #ffffff; --text: #064e3b; --sub-text: #34d399; --border: #d1fae5; }
-        body.theme-rose { --primary: #f43f5e; --bg: #fff1f2; --card: #ffffff; --text: #881337; --sub-text: #fb7185; --border: #ffe4e6; }
-        body.theme-gold { --primary: #d97706; --bg: #fef3c7; --card: #ffffff; --text: #78350f; --sub-text: #fbbf24; --border: #fde68a; }
-        body.theme-cyber { --primary: #00ff41; --bg: #000000; --card: #0d0d0d; --text: #00ff41; --sub-text: #008f11; --border: #003b00; }
+        body.theme-dark { --primary: #818cf8; --bg: #020617; --card: #1e293b; --text: #f1f5f9; --sub-text: #94a3b8; --border: #334155; --shadow: rgba(0, 0, 0, 0.5); }
+        body.theme-cyber { --primary: #00ff41; --bg: #000000; --card: #0d0d0d; --text: #00ff41; --sub-text: #008f11; --border: #003b00; --shadow: rgba(0, 255, 65, 0.2); }
 
         body { 
             background-color: var(--bg); color: var(--text); font-family: 'Pretendard', sans-serif; 
-            margin: 0; padding: 40px 20px; display: flex; justify-content: center; transition: 0.3s;
+            margin: 0; padding: 40px 20px; transition: 0.5s; overflow-x: hidden;
             cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"><text y="20" font-size="20">💰</text></svg>'), auto;
         }
+
+        .main-wrapper { width: 100%; max-width: 1200px; margin: 0 auto; display: none; }
+
+        /* ✨ 3D 레이아웃 설정 */
+        #list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 40px;
+            padding: 40px 0;
+            perspective: 2000px; /* 원근감 깊이 */
+        }
+
+        /* ✨ 3D 카드 디자인 */
+        .item { 
+            background: var(--card); border: 1px solid var(--border); border-radius: 24px;
+            padding: 30px; position: relative;
+            transform-style: preserve-3d;
+            transform: rotateX(10deg) rotateY(-10deg);
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 20px 40px var(--shadow);
+        }
+
+        .item:hover {
+            transform: rotateX(0deg) rotateY(0deg) translateZ(50px);
+            box-shadow: 0 40px 80px var(--shadow);
+            border-color: var(--primary);
+        }
+
+        /* 카드 내부 요소 입체감 */
+        .info { transform: translateZ(30px); }
+        .price { transform: translateZ(40px); font-size: 26px; font-weight: 900; color: var(--primary); margin: 20px 0; }
+        .action-group { transform: translateZ(25px); display: flex; gap: 10px; justify-content: flex-end; align-items: center; }
+
+        /* 상태 인디케이터 (네온 라인) */
+        .status-light {
+            position: absolute; top: 30px; left: 0; width: 6px; height: 40px; border-radius: 0 4px 4px 0;
+            box-shadow: 0 0 15px currentColor;
+        }
+
+        /* 상단 대시보드 (Glassmorphism) */
+        .glass-header {
+            background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);
+            border: 1px solid var(--border); border-radius: 30px; padding: 30px;
+            display: grid; grid-template-columns: 1fr 2fr; gap: 30px; margin-bottom: 40px;
+        }
+
+        .stat-box { text-align: center; }
+        .stat-box label { font-size: 13px; font-weight: 800; color: var(--sub-text); text-transform: uppercase; letter-spacing: 1px; }
+        .stat-box b { font-size: 32px; display: block; margin-top: 5px; }
+
+        /* 입력 폼 디자인 */
+        .input-card { 
+            background: var(--card); border: 1px solid var(--border); border-radius: 20px;
+            padding: 10px; display: flex; gap: 10px; margin-bottom: 20px;
+        }
+        .input-card input { 
+            flex: 1; border: none; background: transparent; color: var(--text);
+            padding: 15px; font-size: 15px; outline: none;
+        }
+        .add-btn { background: var(--primary); color: white; border: none; padding: 0 30px; border-radius: 15px; font-weight: 800; cursor: pointer; transition: 0.3s; }
+        .add-btn:hover { transform: scale(1.05); filter: brightness(1.2); }
+
+        /* 공통 스타일 */
+        .coin-effect { position: fixed; pointer-events: none; font-size: 24px; animation: coin-up 0.8s forwards; z-index: 9999; }
+        @keyframes coin-up { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-100px) scale(2); opacity: 0; } }
         
-        /* 퀵 커맨드 팔레트 (기존 디자인 무드 유지) */
         #cmd-palette {
             display: none; position: fixed; top: 15%; left: 50%; transform: translateX(-50%);
-            width: 90%; max-width: 500px; background: var(--card); border: 2px solid var(--primary);
-            border-radius: 20px; z-index: 10000; box-shadow: 0 20px 40px rgba(0,0,0,0.1); padding: 20px;
+            width: 90%; max-width: 550px; background: var(--card); border: 2px solid var(--primary);
+            border-radius: 24px; z-index: 10000; padding: 30px; box-shadow: 0 30px 60px rgba(0,0,0,0.3);
         }
 
-        .coin-effect { position: fixed; pointer-events: none; font-size: 20px; animation: coin-up 0.8s ease-out forwards; z-index: 9999; }
-        @keyframes coin-up { 0% { transform: translateY(0) scale(1); opacity: 1; } 100% { transform: translateY(-50px) scale(1.5); opacity: 0; } }
-
-        .main-wrapper { width: 100%; max-width: 850px; display: none; }
-        #auth-section { text-align: center; margin-top: 20vh; }
-        .login-btn { background: var(--text); color: var(--bg); border: none; padding: 16px 32px; border-radius: 14px; font-weight: 700; cursor: pointer; font-size: 16px; }
-
-        .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
-        .header h1 { font-size: 28px; font-weight: 800; color: var(--text); margin: 0; cursor: pointer; }
-        .theme-select { border: 1px solid var(--border); background: var(--card); color: var(--text); padding: 8px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
-
-        .stat-card { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .stat-card label { color: var(--sub-text); font-size: 13px; font-weight: 700; margin-bottom: 8px; display: block; }
-        .stat-card b { font-size: 24px; }
-
-        .progress-container { width: 100%; height: 10px; background: var(--border); border-radius: 10px; margin-top: 15px; overflow: hidden; }
-        #progress-bar { height: 100%; width: 0%; background: var(--primary); transition: 0.5s; }
-
-        .search-box input { width: 100%; box-sizing: border-box; border: 2px solid var(--border); background: var(--card); color: var(--text); padding: 14px 20px; border-radius: 16px; outline: none; margin-bottom: 20px; }
-
-        .input-card { background: var(--card); padding: 20px; border-radius: 20px; display: flex; gap: 10px; margin-bottom: 25px; border: 1px solid var(--border); }
-        .input-card input { flex: 1; border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 12px 15px; border-radius: 12px; font-size: 14px; outline: none; }
-        .add-btn { background: var(--primary); color: white; border: none; padding: 0 25px; border-radius: 12px; font-weight: 700; cursor: pointer; }
-
-        .item { 
-            background: var(--card); margin-bottom: 12px; padding: 18px 22px; border-radius: 20px; 
-            display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); transition: 0.2s; 
-        }
-        .info { flex: 2; min-width: 0; margin-right: 15px; }
-        .info .title { font-weight: 700; font-size: 16px; color: var(--text); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .info .client { font-size: 12px; color: var(--sub-text); margin-top: 3px; display: block; }
-        .price { flex: 1; font-weight: 800; color: var(--text); font-size: 15px; text-align: right; margin-right: 20px; white-space: nowrap; }
-        .action-group { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .btn-copy { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 10px; font-size: 12px; cursor: pointer; }
-        .st-select { width: 100px; border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 8px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
+        .st-select { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px; border-radius: 10px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body class="theme-default">
 
 <div id="cmd-palette">
-    <div style="font-size:11px; color:var(--primary); font-weight:800; margin-bottom:10px;">⚡ QUICK COMMAND</div>
-    <input type="text" id="cmd-input" placeholder="/add 프로젝트,고객,금액 또는 검색어..." 
-           style="width:100%; background:transparent; border:none; color:var(--text); font-size:18px; outline:none; font-family:'Pretendard';">
+    <div style="font-size:12px; color:var(--primary); font-weight:900; margin-bottom:15px; letter-spacing:2px;">🚀 SYSTEM COMMAND</div>
+    <input type="text" id="cmd-input" placeholder="/add 프로젝트,고객,금액 ..." style="width:100%; border:none; background:transparent; font-size:22px; color:var(--text); outline:none;">
 </div>
 
-<div id="auth-section">
-    <h1>iArch Console</h1>
-    <button class="login-btn" onclick="login()">Google Login</button>
+<div id="auth-section" style="text-align: center; margin-top: 30vh;">
+    <h1 style="font-size: 40px; font-weight: 900;">iArch Studio <span style="color:var(--primary)">3D</span></h1>
+    <button class="login-btn" onclick="login()" style="background:var(--text); color:var(--bg); padding: 20px 40px; border-radius: 20px; border:none; cursor:pointer; font-weight:800;">Google Console Login</button>
 </div>
 
 <div class="main-wrapper" id="main-wrapper">
-    <div class="header">
-        <h1 onclick="logout()">iArch Studio 💸</h1>
-        <select class="theme-select" onchange="changeTheme(this.value)" id="themeSelector">
-            <option value="default">🌐 라이트 모드</option>
-            <option value="dark">🌑 다크 모드</option>
-            <option value="mint">🌿 민트 포레스트</option>
-            <option value="rose">🌸 로즈 핑크</option>
-            <option value="gold">🧀 골드 치즈</option>
-            <option value="cyber">👽 사이버 펑크</option>
+    <div class="header" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:40px;">
+        <h1 style="font-weight: 900; font-size: 32px; margin:0;" onclick="logout()">iArch 💸</h1>
+        <select class="theme-select" onchange="changeTheme(this.value)" id="themeSelector" style="padding:10px; border-radius:12px;">
+            <option value="default">🌐 Light Mode</option>
+            <option value="dark">🌑 Dark Vision</option>
+            <option value="cyber">👽 Cyber Engine</option>
         </select>
     </div>
 
-    <div style="display: grid; grid-template-columns: 1fr 1.5fr; gap: 15px; margin-bottom: 25px;">
-        <div class="stat-card">
-            <label>누적 매출</label>
+    <div class="glass-header">
+        <div class="stat-box">
+            <label>Total Revenue</label>
             <b id="sum-revenue">0원</b>
         </div>
-        <div class="stat-card">
-            <label>공정 진행률 <span id="active-info" style="float:right">0건</span></label>
-            <b id="progress-percent">0%</b>
-            <div class="progress-container"><div id="progress-bar"></div></div>
+        <div class="stat-box">
+            <label>Operations Progress (<span id="active-info">0</span> Active)</label>
+            <b id="progress-percent" style="color:var(--primary)">0%</b>
+            <div style="width:100%; height:8px; background:var(--border); border-radius:10px; margin-top:15px; overflow:hidden;">
+                <div id="progress-bar" style="height:100%; width:0%; background:var(--primary); transition:1s;"></div>
+            </div>
         </div>
-    </div>
-
-    <div class="search-box">
-        <input type="text" id="searchInput" onkeyup="renderList()" placeholder="프로젝트 또는 고객명 검색...">
     </div>
 
     <div class="input-card">
-        <input type="text" id="p" placeholder="프로젝트명">
-        <input type="text" id="c" placeholder="고객 닉네임">
-        <input type="number" id="v" placeholder="금액">
+        <input type="text" id="p" placeholder="Project Name">
+        <input type="text" id="c" placeholder="Client">
+        <input type="number" id="v" placeholder="Amount">
         <button class="add-btn" onclick="add()">DEPLOY</button>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="searchInput" onkeyup="renderList()" placeholder="Quick Search Workspace..." 
+               style="width:100%; padding:20px; border-radius:20px; border:1px solid var(--border); background:var(--card); color:var(--text); outline:none; margin-bottom:30px;">
     </div>
 
     <div id="list"></div>
 </div>
 
 <script>
-    /* --- 기존 동전 효과 & 사운드 --- */
+    // [기존 파이어베이스 및 효과 로직 유지]
     function playCoinSound() {
         const context = new (window.AudioContext || window.webkitAudioContext)();
         const osc = context.createOscillator();
         const gain = context.createGain();
-        osc.type = 'triangle'; 
-        osc.frequency.setValueAtTime(900, context.currentTime);
-        osc.frequency.exponentialRampToValueAtTime(1500, context.currentTime + 0.1);
+        osc.type = 'sine'; osc.frequency.setValueAtTime(1200, context.currentTime);
         gain.gain.setValueAtTime(0.1, context.currentTime);
         gain.gain.exponentialRampToValueAtTime(0.01, context.currentTime + 0.3);
-        osc.connect(gain);
-        gain.connect(context.destination);
-        osc.start();
-        osc.stop(context.currentTime + 0.3);
+        osc.connect(gain); gain.connect(context.destination);
+        osc.start(); osc.stop(context.currentTime + 0.3);
     }
 
     window.addEventListener('click', (e) => {
@@ -150,7 +173,6 @@
         setTimeout(() => coin.remove(), 800);
     });
 
-    /* --- 파이어베이스 설정 --- */
     const firebaseConfig = {
         apiKey: "AIzaSyAP1bV3mqVQBPZn1CV_YQ0BlboJiIDkATs",
         authDomain: "operation-502d9.firebaseapp.com",
@@ -168,28 +190,22 @@
 
     let projects = [];
 
-    /* --- 기존 테마 & 인증 로직 --- */
     function changeTheme(theme) {
         document.body.className = theme === 'default' ? '' : 'theme-' + theme;
         localStorage.setItem('iarch-theme', theme);
     }
-    const savedTheme = localStorage.getItem('iarch-theme') || 'default';
-    changeTheme(savedTheme);
-    document.getElementById('themeSelector').value = savedTheme;
+    changeTheme(localStorage.getItem('iarch-theme') || 'default');
 
     auth.onAuthStateChanged(user => {
         if (user) {
             document.getElementById('auth-section').style.display = 'none';
             document.getElementById('main-wrapper').style.display = 'block';
             syncData();
-        } else {
-            document.getElementById('auth-section').style.display = 'block';
-            document.getElementById('main-wrapper').style.display = 'none';
         }
     });
 
     function login() { auth.signInWithPopup(provider); }
-    function logout() { if(confirm('로그아웃 하시겠습니까?')) auth.signOut(); }
+    function logout() { if(confirm('Logout?')) auth.signOut().then(()=>location.reload()); }
 
     function syncData() {
         db.collection("iarch_ledger").orderBy("fullDate", "desc").onSnapshot(snapshot => {
@@ -198,7 +214,7 @@
         });
     }
 
-    /* --- 기존 렌더링 & 관리 로직 --- */
+    // ✨ 3D 타일 렌더링 로직
     function renderList() {
         const list = document.getElementById('list');
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
@@ -206,22 +222,24 @@
         const filtered = projects.filter(o => o.p.toLowerCase().includes(searchTerm) || o.c.toLowerCase().includes(searchTerm));
         
         filtered.forEach(o => {
+            const statusColor = o.s === 'd' ? '#10b981' : (o.s === 'i' ? '#6366f1' : '#64748b');
             const div = document.createElement('div');
             div.className = 'item';
             div.innerHTML = `
+                <div class="status-light" style="color:${statusColor}; background-color:currentColor;"></div>
                 <div class="info">
-                    <span class="title">${o.p}</span>
-                    <span class="client">👤 ${o.c} · 📅 ${o.date}</span>
+                    <div style="font-size:12px; color:var(--sub-text); margin-bottom:5px; font-weight:800;">${o.date}</div>
+                    <div class="title" style="font-size:20px; font-weight:900;">${o.p}</div>
+                    <div style="color:var(--sub-text); margin-top:5px;">👤 ${o.c}</div>
                 </div>
                 <div class="price">₩${Number(o.v).toLocaleString()}</div>
                 <div class="action-group">
-                    <button class="btn-copy" onclick="copyInfo('${o.p}','${o.c}','${o.v}','${o.s}')">Copy</button>
                     <select onchange="updateStatus('${o.id}', this.value)" class="st-select">
                         <option value="w" ${o.s==='w'?'selected':''}>Pending</option>
                         <option value="i" ${o.s==='i'?'selected':''}>Running</option>
                         <option value="d" ${o.s==='d'?'selected':''}>Success</option>
                     </select>
-                    <button onclick="remove('${o.id}')" style="background:none; border:none; color:var(--sub-text); cursor:pointer; font-size:18px;">×</button>
+                    <button onclick="remove('${o.id}')" style="background:none; border:none; color:var(--sub-text); cursor:pointer; font-size:20px;">×</button>
                 </div>
             `;
             list.appendChild(div);
@@ -236,13 +254,7 @@
         document.getElementById('sum-revenue').innerText = rev.toLocaleString() + '원';
         document.getElementById('progress-percent').innerText = progress + '%';
         document.getElementById('progress-bar').style.width = progress + '%';
-        document.getElementById('active-info').innerText = `${running}건 진행 중`;
-    }
-
-    function copyInfo(p, c, v, s) {
-        const statusMsg = s === 'd' ? '✅ 완료' : (s === 'i' ? '⚙️ 진행중' : '⏳ 대기');
-        const text = `[iArch Studio]\n고객: ${c}\n프젝: ${p}\n금액: ₩${Number(v).toLocaleString()}\n상태: ${statusMsg}`;
-        navigator.clipboard.writeText(text).then(() => alert('복사완료!'));
+        document.getElementById('active-info').innerText = running;
     }
 
     function add() {
@@ -256,19 +268,16 @@
         p.value=''; c.value=''; v.value='';
     }
     function updateStatus(id, val) { db.collection("iarch_ledger").doc(id).update({ s: val }); }
-    function remove(id) { if(confirm('삭제하시겠습니까?')) db.collection("iarch_ledger").doc(id).delete(); }
+    function remove(id) { if(confirm('Delete Project?')) db.collection("iarch_ledger").doc(id).delete(); }
 
-    /* --- ⚡ 퀵 커맨드 시스템 스크립트 (새 기능) --- */
+    // ⚡ Command Palette
     window.addEventListener('keydown', (e) => {
         if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
             e.preventDefault();
-            const palette = document.getElementById('cmd-palette');
-            palette.style.display = 'block';
+            document.getElementById('cmd-palette').style.display = 'block';
             document.getElementById('cmd-input').focus();
         }
-        if (e.key === 'Escape') {
-            document.getElementById('cmd-palette').style.display = 'none';
-        }
+        if (e.key === 'Escape') document.getElementById('cmd-palette').style.display = 'none';
     });
 
     document.getElementById('cmd-input').addEventListener('keypress', (e) => {
@@ -284,15 +293,11 @@
                     });
                     document.getElementById('cmd-palette').style.display = 'none';
                     e.target.value = '';
-                } else {
-                    alert('형식 오류: 프젝명,고객명,금액');
                 }
             } else {
-                // 명령어가 아니면 검색으로 처리
                 document.getElementById('searchInput').value = val;
                 renderList();
                 document.getElementById('cmd-palette').style.display = 'none';
-                e.target.value = '';
             }
         }
     });
