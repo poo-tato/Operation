@@ -9,17 +9,11 @@
     <style>
         @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
         
-        /* 테마 변수 설정 */
         :root {
-            --primary: #6366f1;
-            --bg: #f1f5f9;
-            --card: #ffffff;
-            --text: #0f172a;
-            --sub-text: #64748b;
-            --border: #e2e8f0;
+            --primary: #6366f1; --bg: #f1f5f9; --card: #ffffff;
+            --text: #0f172a; --sub-text: #64748b; --border: #e2e8f0;
         }
 
-        /* 테마별 색상 정의 */
         body.theme-dark { --primary: #818cf8; --bg: #0f172a; --card: #1e293b; --text: #f1f5f9; --sub-text: #94a3b8; --border: #334155; }
         body.theme-mint { --primary: #10b981; --bg: #ecfdf5; --card: #ffffff; --text: #064e3b; --sub-text: #34d399; --border: #d1fae5; }
         body.theme-rose { --primary: #f43f5e; --bg: #fff1f2; --card: #ffffff; --text: #881337; --sub-text: #fb7185; --border: #ffe4e6; }
@@ -34,30 +28,35 @@
 
         .header { margin-bottom: 30px; display: flex; justify-content: space-between; align-items: center; }
         .header h1 { font-size: 28px; font-weight: 800; color: var(--text); margin: 0; cursor: pointer; }
-        
-        /* 테마 드롭다운 */
-        .theme-select { border: 1px solid var(--border); background: var(--card); color: var(--text); padding: 8px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; outline: none; cursor: pointer; }
+        .theme-select { border: 1px solid var(--border); background: var(--card); color: var(--text); padding: 8px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; }
 
-        .stat-card { background: var(--card); padding: 20px; border-radius: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); border: 1px solid var(--border); }
+        .stat-card { background: var(--card); padding: 20px; border-radius: 20px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
         .stat-card label { color: var(--sub-text); font-size: 13px; font-weight: 700; margin-bottom: 8px; display: block; }
-        .stat-card b { color: var(--text); font-size: 24px; }
+        .stat-card b { font-size: 24px; }
+
+        .progress-container { width: 100%; height: 10px; background: var(--border); border-radius: 10px; margin-top: 15px; overflow: hidden; }
+        #progress-bar { height: 100%; width: 0%; background: var(--primary); transition: 0.5s; }
+
+        .search-box input { width: 100%; box-sizing: border-box; border: 2px solid var(--border); background: var(--card); color: var(--text); padding: 14px 20px; border-radius: 16px; outline: none; margin-bottom: 20px; }
 
         .input-card { background: var(--card); padding: 20px; border-radius: 20px; display: flex; gap: 10px; margin-bottom: 25px; border: 1px solid var(--border); }
         .input-card input { flex: 1; border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 12px 15px; border-radius: 12px; font-size: 14px; outline: none; }
         .add-btn { background: var(--primary); color: white; border: none; padding: 0 25px; border-radius: 12px; font-weight: 700; cursor: pointer; }
 
-        .item { background: var(--card); margin-bottom: 12px; padding: 18px 22px; border-radius: 20px; display: flex; align-items: center; border: 1px solid var(--border); transition: 0.2s; }
-        .info .title { font-weight: 700; font-size: 16px; color: var(--text); }
+        /* 🔥 수정된 아이템 레이아웃 */
+        .item { 
+            background: var(--card); margin-bottom: 12px; padding: 18px 22px; border-radius: 20px; 
+            display: flex; align-items: center; justify-content: space-between; border: 1px solid var(--border); transition: 0.2s; 
+        }
+        .info { flex: 2; min-width: 0; margin-right: 15px; }
+        .info .title { font-weight: 700; font-size: 16px; color: var(--text); display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
         .info .client { font-size: 12px; color: var(--sub-text); margin-top: 3px; display: block; }
-        .price { font-weight: 800; margin-right: 20px; color: var(--text); font-size: 15px; }
-
-        .progress-container { width: 100%; height: 10px; background: var(--border); border-radius: 10px; margin-top: 15px; overflow: hidden; }
-        #progress-bar { height: 100%; width: 0%; background: var(--primary); transition: 0.5s; }
-
-        .btn-copy { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 10px; font-size: 12px; cursor: pointer; }
-        select.st-select { border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 8px; border-radius: 10px; font-size: 12px; font-weight: 700; }
         
-        .search-box input { width: 100%; box-sizing: border-box; border: 2px solid var(--border); background: var(--card); color: var(--text); padding: 14px 45px; border-radius: 16px; outline: none; margin-bottom: 20px; }
+        .price { flex: 1; font-weight: 800; color: var(--text); font-size: 15px; text-align: right; margin-right: 20px; white-space: nowrap; }
+        .action-group { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+        
+        .btn-copy { background: var(--bg); border: 1px solid var(--border); color: var(--text); padding: 8px 12px; border-radius: 10px; font-size: 12px; cursor: pointer; }
+        .st-select { border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 8px; border-radius: 10px; font-size: 12px; font-weight: 700; cursor: pointer; }
     </style>
 </head>
 <body class="theme-default">
@@ -92,7 +91,7 @@
         </div>
     </div>
 
-    <div class="search-box" style="position:relative">
+    <div class="search-box">
         <input type="text" id="searchInput" onkeyup="renderList()" placeholder="프로젝트 또는 고객명 검색...">
     </div>
 
@@ -107,7 +106,6 @@
 </div>
 
 <script>
-    // 파이어베이스 설정 (기존 본인 것 그대로 유지)
     const firebaseConfig = {
         apiKey: "AIzaSyAP1bV3mqVQBPZn1CV_YQ0BlboJiIDkATs",
         authDomain: "operation-502d9.firebaseapp.com",
@@ -125,13 +123,11 @@
 
     let projects = [];
 
-    // 테마 변경 함수
     function changeTheme(theme) {
         document.body.className = theme === 'default' ? '' : 'theme-' + theme;
         localStorage.setItem('iarch-theme', theme);
     }
 
-    // 저장된 테마 불러오기
     const savedTheme = localStorage.getItem('iarch-theme') || 'default';
     changeTheme(savedTheme);
     document.getElementById('themeSelector').value = savedTheme;
@@ -162,20 +158,24 @@
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         list.innerHTML = '';
         const filtered = projects.filter(o => o.p.toLowerCase().includes(searchTerm) || o.c.toLowerCase().includes(searchTerm));
+        
         filtered.forEach(o => {
             const div = document.createElement('div');
             div.className = 'item';
             div.innerHTML = `
-                <div class="info"><span class="title">${o.p}</span><span class="client">👤 ${o.c} · 📅 ${o.date}</span></div>
+                <div class="info">
+                    <span class="title">${o.p}</span>
+                    <span class="client">👤 ${o.c} · 📅 ${o.date}</span>
+                </div>
                 <div class="price">₩${Number(o.v).toLocaleString()}</div>
-                <div style="display:flex; gap:8px;">
+                <div class="action-group">
                     <button class="btn-copy" onclick="copyInfo('${o.p}','${o.c}','${o.v}','${o.s}')">Copy</button>
                     <select onchange="updateStatus('${o.id}', this.value)" class="st-select">
                         <option value="w" ${o.s==='w'?'selected':''}>Pending</option>
                         <option value="i" ${o.s==='i'?'selected':''}>Running</option>
                         <option value="d" ${o.s==='d'?'selected':''}>Success</option>
                     </select>
-                    <button onclick="remove('${o.id}')" style="background:none; border:none; color:var(--sub-text); cursor:pointer">×</button>
+                    <button onclick="remove('${o.id}')" style="background:none; border:none; color:var(--sub-text); cursor:pointer; font-size:18px;">×</button>
                 </div>
             `;
             list.appendChild(div);
