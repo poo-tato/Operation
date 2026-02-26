@@ -9,17 +9,27 @@
         body { background-color: #f8fafc; color: #334155; font-family: 'Pretendard', sans-serif; margin: 0; padding: 60px 20px; display: flex; justify-content: center; }
         .main-wrapper { width: 100%; max-width: 850px; }
 
-        .header { margin-bottom: 40px; }
+        .header { margin-bottom: 40px; display: flex; justify-content: space-between; align-items: flex-end; }
         .header h1 { font-size: 36px; font-weight: 800; color: #0f172a; margin: 0; letter-spacing: -1px; }
         .header p { color: #94a3b8; margin-top: 8px; font-size: 15px; }
 
-        .summary-bar { display: flex; gap: 40px; margin-bottom: 40px; padding: 15px 5px; border-bottom: 2px solid #f1f5f9; }
+        .summary-bar { display: flex; gap: 40px; margin-bottom: 30px; padding: 15px 5px; border-bottom: 2px solid #f1f5f9; }
         .summary-item b { color: #6366f1; font-size: 24px; font-weight: 800; }
         .summary-item span { font-size: 14px; color: #64748b; margin-left: 8px; font-weight: 600; }
 
+        /* 검색창 스타일 */
+        .search-box { margin-bottom: 20px; position: relative; }
+        .search-box input { 
+            width: 100%; box-sizing: border-box; border: 2px solid #e2e8f0; background: #fff; 
+            padding: 12px 18px 12px 45px; border-radius: 14px; font-size: 14px; outline: none; transition: 0.2s;
+        }
+        .search-box input:focus { border-color: #6366f1; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .search-box::before { content: "🔍"; position: absolute; left: 18px; top: 12px; font-size: 16px; opacity: 0.5; }
+
         .input-card { background: white; padding: 25px; border-radius: 24px; box-shadow: 0 10px 30px -5px rgba(0,0,0,0.04); display: flex; gap: 12px; margin-bottom: 30px; border: 1px solid #f1f5f9; }
-        input { flex: 1; border: 1px solid #e2e8f0; background: #fff; padding: 14px 18px; border-radius: 14px; font-size: 14px; outline: none; transition: 0.2s; }
-        input:focus { border-color: #6366f1; background: #fdfeff; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1); }
+        .input-card input { flex: 1; border: 1px solid #e2e8f0; background: #fff; padding: 14px 18px; border-radius: 14px; font-size: 14px; outline: none; transition: 0.2s; }
+        .input-card input:focus { border-color: #6366f1; background: #fdfeff; }
+        
         .add-btn { background: #0f172a; color: white; border: none; padding: 0 30px; border-radius: 14px; font-weight: 700; cursor: pointer; transition: 0.2s; }
         .add-btn:hover { background: #1e293b; transform: translateY(-2px); }
 
@@ -30,13 +40,12 @@
 
         .price { font-weight: 800; margin-right: 25px; color: #334155; font-size: 16px; }
 
-        /* 상태별 색상 적용 */
-        select { border: 1px solid #e2e8f0; background: #f8fafc; padding: 8px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; outline: none; transition: 0.2s; }
-        select.st-w { color: #94a3b8; } /* 대기 - 회색 */
-        select.st-i { color: #6366f1; border-color: #c7d2fe; background: #eef2ff; } /* 진행 - 파랑 */
-        select.st-d { color: #10b981; border-color: #a7f3d0; background: #ecfdf5; } /* 완료 - 초록 */
+        select { border: 1px solid #e2e8f0; background: #f8fafc; padding: 8px 12px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; outline: none; }
+        .st-w { color: #94a3b8; } 
+        .st-i { color: #6366f1; border-color: #c7d2fe; background: #eef2ff; } 
+        .st-d { color: #10b981; border-color: #a7f3d0; background: #ecfdf5; } 
 
-        .btn-del { margin-left: 20px; background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 13px; font-weight: 500; }
+        .btn-del { margin-left: 20px; background: none; border: none; color: #cbd5e1; cursor: pointer; font-size: 13px; }
         .btn-del:hover { color: #f43f5e; }
     </style>
 </head>
@@ -44,13 +53,20 @@
 
 <div class="main-wrapper">
     <div class="header">
-        <h1>돈 많이 벌자 💸</h1>
-        <p id="total-info">iArch Studio Operation Ledger</p>
+        <div>
+            <h1>돈 많이 벌자 💸</h1>
+            <p>iArch Studio Operation Ledger</p>
+        </div>
+        <div id="clock" style="font-size: 13px; color: #cbd5e1; font-family: monospace;"></div>
     </div>
 
     <div class="summary-bar">
         <div class="summary-item"><b id="count-active">0</b><span>진행 중</span></div>
         <div class="summary-item"><b id="sum-revenue">0원</b><span>누적 매출</span></div>
+    </div>
+
+    <div class="search-box">
+        <input type="text" id="searchInput" onkeyup="render()" placeholder="프로젝트명 또는 고객 닉네임으로 검색...">
     </div>
 
     <div class="input-card">
@@ -68,11 +84,22 @@
 
     function render() {
         const list = document.getElementById('list');
+        const searchTerm = document.getElementById('searchInput').value.toLowerCase();
         list.innerHTML = '';
         
-        db.sort((a, b) => new Date(b.date) - new Date(a.date)); // 최신순 정렬
+        // 검색 필터링 적용
+        const filteredDb = db.filter(item => 
+            item.p.toLowerCase().includes(searchTerm) || 
+            item.c.toLowerCase().includes(searchTerm)
+        );
 
-        db.forEach((o, i) => {
+        // 최신순 정렬
+        filteredDb.sort((a, b) => new Date(b.fullDate) - new Date(a.fullDate));
+
+        filteredDb.forEach((o, i) => {
+            // 원본 배열에서의 실제 인덱스를 찾아야 함 (삭제/상태변경용)
+            const originalIndex = db.findIndex(item => item === o);
+
             const div = document.createElement('div');
             div.className = 'item';
             div.innerHTML = `
@@ -80,16 +107,16 @@
                     <span class="title">${o.p}</span>
                     <span class="client">
                         <span>👤 ${o.c}</span>
-                        <span>📅 ${o.date || '날짜없음'}</span>
+                        <span>📅 ${o.date || '-'}</span>
                     </span>
                 </div>
                 <div class="price">₩${Number(o.v).toLocaleString()}</div>
-                <select onchange="st(${i}, this.value)" class="st-${o.s}">
+                <select onchange="st(${originalIndex}, this.value)" class="st-${o.s}">
                     <option value="w" ${o.s==='w'?'selected':''}>대기</option>
                     <option value="i" ${o.s==='i'?'selected':''}>진행</option>
                     <option value="d" ${o.s==='d'?'selected':''}>완료</option>
                 </select>
-                <button class="btn-del" onclick="rm(${i})">삭제</button>
+                <button class="btn-del" onclick="rm(${originalIndex})">삭제</button>
             `;
             list.appendChild(div);
         });
@@ -115,14 +142,21 @@
             c: c.value, 
             v: v.value, 
             s: 'w',
-            date: dateStr // 날짜 추가
+            date: dateStr,
+            fullDate: now.toISOString() // 정렬용 전체 날짜
         });
         save(); p.value=''; c.value=''; v.value='';
+        document.getElementById('searchInput').value = ''; // 추가 후 검색 초기화
     }
 
     function st(i,v){ db[i].s=v; save(); }
-    function rm(i){ if(confirm('정말 삭제하시겠습니까?')){ db.splice(i,1); save(); } }
+    function rm(i){ if(confirm('프로젝트 기록을 삭제할까요?')){ db.splice(i,1); save(); } }
     function save(){ localStorage.setItem('iarch_vFinal', JSON.stringify(db)); render(); }
+
+    setInterval(() => {
+        const n = new Date();
+        document.getElementById('clock').innerText = n.toLocaleTimeString();
+    }, 1000);
 
     render();
 </script>
